@@ -1,25 +1,34 @@
 from datetime import datetime
+import os
 import joblib
 import pandas as pd
 
 
 def load_model():
   """Loads the trained ML pipeline from the pkl file."""
-  filename = "demand_prediction_pipeline.pkl"
+  candidates = [
+      "demand_prediction_pipeline.pkl",
+      os.path.join(os.path.dirname(__file__), "..", "demand_prediction_pipeline.pkl"),
+  ]
+  filename = candidates[0]
+  for c in candidates:
+    if os.path.exists(c):
+      filename = c
+      break
+
   try:
     pipeline = joblib.load(filename)
     print(f"Model loaded successfully from {filename}\n")
     return pipeline
   except FileNotFoundError:
     print(
-        f"Error: {filename} not found! Please run `train_model.py` first to"
-        " generate the model."
+        f"Error: {filename} not found! Please check that demand_prediction_pipeline.pkl exists."
     )
     return None
 
 
 def get_user_input():
-  """Takes only Location, Date, and Time inputs from the user across all LPU blocks."""
+  """Takes Location, Date, and Time inputs from the user across all LPU blocks."""
   print("=" * 65)
   print("     LPU CAMPUS SHUTTLE & PASSENGER DEMAND PREDICTION SYSTEM      ")
   print("=" * 65)
@@ -120,20 +129,15 @@ def get_user_input():
         47: {"ID": "Boys Studio 13", "Name": "Boys Studio 13", "Type": "Hostel"},
     }
 
-    print("\n[1] Select Campus Location / Block:")
+    print("\n[1] Campus Locations:")
     for key, val in locations.items():
       print(f"  {key:2d}. [{val['ID']}] {val['Name']} ({val['Type']})")
 
-    loc_choice = int(input("\nEnter Location Index Number (1-47): "))
-    if loc_choice in locations:
-      inputs["Location_ID"] = locations[loc_choice]["ID"]
-      inputs["Location_Name"] = locations[loc_choice]["Name"]
-      inputs["Location_Type"] = locations[loc_choice]["Type"]
-    else:
-      print("Invalid choice, defaulting to Block 34.")
-      inputs["Location_ID"] = "34"
-      inputs["Location_Name"] = "Block 34 (CSE Dept)"
-      inputs["Location_Type"] = "Academic"
+    pickup_choice = int(input("\nEnter Pickup Location Index Number (1-47): "))
+    drop_choice = int(input("Enter Drop-off Location Index Number (1-47): "))
+
+    pickup = locations.get(pickup_choice, locations[1])
+    drop = locations.get(drop_choice, locations[29])
 
     # 2. Date & Time Selection
     date_str = input(
@@ -144,38 +148,35 @@ def get_user_input():
     else:
       dt = datetime.strptime(date_str, "%Y-%m-%d")
 
-    inputs["Month"] = dt.month
-    inputs["Day_of_Week"] = dt.strftime("%A")
-    inputs["Is_Weekend"] = 1 if inputs["Day_of_Week"] in ["Saturday", "Sunday"] else 0
-
     hour = int(
         input(
-            "Enter Hour in 24-hour format (0-23, e.g., 9 for 9 AM, 15 for 3 PM):"
-            " "
+            "Enter Hour in 24-hour format (0-23, e.g., 9 for 9 AM, 15 for 3 PM): "
         )
     )
-    inputs["Hour"] = hour
 
-    # Automatically derive Time Slot based on hour
-    if 6 <= hour < 12:
-      inputs["Time_Slot"] = "Morning"
-    elif 12 <= hour < 17:
-      inputs["Time_Slot"] = "Afternoon"
-    elif 17 <= hour < 21:
-      inputs["Time_Slot"] = "Evening"
-    else:
-      inputs["Time_Slot"] = "Night"
-
-    # Automatically set standard/default values for background environmental/operational columns
-    inputs["Weather"] = "Clear"
-    inputs["Temperature_C"] = 28.0
-    inputs["Is_Peak_Hour"] = (
-        1 if (8 <= hour <= 10) or (16 <= hour <= 18) else 0
-    )
-    inputs["Is_Exam_Period"] = 0
-    inputs["Is_Event_Day"] = 0
-    inputs["Available_Shuttles"] = 5
-    inputs["Avg_Wait_Time_Min"] = 5.0
+    inputs = {
+        "Day_of_Week": dt.strftime("%A"),
+        "Start_Time": f"{hour:02d}:00",
+        "Hour": hour,
+        "Is_Weekend": "Yes" if dt.strftime("%A") in ["Saturday", "Sunday"] else "No",
+        "Month": dt.strftime("%B"),
+        "Week_Number": int(dt.strftime("%W")) if hasattr(dt, "strftime") else 10,
+        "Vehicle_ID": "V001",
+        "Vehicle_Capacity": 30,
+        "Pickup_Block": pickup["ID"],
+        "Pickup_Location_Name": pickup["Name"],
+        "Pickup_Location_Type": pickup["Type"],
+        "Drop_Block": drop["ID"],
+        "Drop_Location_Name": drop["Name"],
+        "Drop_Location_Type": drop["Type"],
+        "Route": f"{pickup['ID']} → {drop['ID']}",
+        "Distance_m": 500.0,
+        "Travel_Time_Min": 3.0,
+        "Traffic_Level": "Medium",
+        "Peak_Hour": "Yes" if (8 <= hour <= 10) or (16 <= hour <= 18) else "No",
+        "Weather": "Normal",
+        "Demand_Level": "High",
+    }
 
   except (ValueError, IndexError):
     print(

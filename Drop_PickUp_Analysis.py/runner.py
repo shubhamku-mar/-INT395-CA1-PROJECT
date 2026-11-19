@@ -20,10 +20,7 @@ def load_model():
 
 def load_dataset():
     """Loads the master dataset for contextual route analysis."""
-    file_path = "LPU_Transportation_Master_Dataset_10000.xlsx"
-    if not os.path.exists(file_path):
-        # Fallback path if stored in downloads
-        file_path = r"C:\Users\ARYAN MAHAKUR\Downloads\LPU_Transportation_Master_Dataset_10000 (1).xlsx"
+    file_path = "LPU_Transportation_Master_Dataset_10000.xlsx" if os.path.exists("LPU_Transportation_Master_Dataset_10000.xlsx") else os.path.join(os.path.dirname(__file__), "..", "LPU_Transportation_Master_Dataset_10000.xlsx")
     try:
         return pd.read_excel(file_path, sheet_name="Ride Records")
     except Exception:

@@ -9,7 +9,7 @@ import folium
 # 1. CONFIGURATION
 # =========================================================
 
-EXCEL_FILE = r"C:\Users\ARYAN MAHAKUR\Downloads\LPU_All_Locations.xlsx"
+EXCEL_FILE = "LPU_All_Locations.xlsx" if os.path.exists("LPU_All_Locations.xlsx") else os.path.join(os.path.dirname(__file__), "..", "LPU_All_Locations.xlsx") if os.path.exists(os.path.join(os.path.dirname(__file__), "..", "LPU_All_Locations.xlsx")) else "LPU_All_Locations.xlsx"
 
 OSRM_URL = "https://router.project-osrm.org"
 

@@ -1,337 +1,279 @@
-import streamlit as st
 import base64
 import os
+import streamlit as st
 import streamlit.components.v1 as components
+
+# Import shared LPU Black & Dark Orange Theme
+from assets.frontend_theme import (
+    inject_lpu_theme,
+    render_centered_loading_screen,
+    render_top_banner,
+    render_cinematic_footer,
+    get_lpu_logo_url,
+    get_lpu_campus_url,
+)
 
 # 1. Page Configuration (Must be first Streamlit command)
 st.set_page_config(
-    page_title="ShuttleLyze",
+    page_title="ShuttleLyze - LPU Campus Transit AI",
     page_icon="🚌",
     layout="wide"
 )
 
-# Helper function to convert local SVG to Base64 data URL
-def get_svg_data_url(svg_path):
-    if os.path.exists(svg_path):
-        with open(svg_path, "r", encoding="utf-8") as f:
-            svg_content = f.read()
-        b64 = base64.b64encode(svg_content.encode('utf-8')).decode('utf-8')
-        return f"data:image/svg+xml;base64,{b64}"
-    return None
+# 2. Inject Black & Dark Orange Theme Styles
+inject_lpu_theme()
 
-logo_svg_url = get_svg_data_url("C:/Users/ARYAN MAHAKUR/Downloads/lpu-logo.svg")
+# 3. Centered LPU Logo Loading Screen (Smooth opening animation)
+render_centered_loading_screen()
 
-# 2. Custom CSS (Includes Fix for Expander Visibility)
-st.markdown("""
-<style>
-    /* Force main app background to pure white shade */
-    .stApp {
-        background-color: #ffffff !important;
-    }
-    
-    /* Remove default Streamlit top header whitespace & hide sidebar nav entirely */
-    .stApp header {
-        visibility: hidden;
-        height: 0px;
-    }
-    [data-testid="stSidebar"] {
-        display: none;
-    }
-    .block-container {
-        padding-top: 0rem !important;
-        padding-left: 0rem !important;
-        padding-right: 0rem !important;
-        background-color: #ffffff !important;
-    }
-    
-    /* Top Deep Maroon Banner */
-    .top-banner {
-        background-color: #800000;
-        color: white;
-        padding: 10px 30px;
-        font-size: 13px;
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        font-weight: 500;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        letter-spacing: 0.5px;
-    }
-    
-    .support-box {
-        border: 1px solid white;
-        padding: 5px 15px;
-        font-size: 12px;
-        letter-spacing: 0.5px;
-    }
+# 4. Top University Status Bar
+render_top_banner()
 
-    /* Hero Section */
-    .hero-container {
-        background-color: #f8f9fa;
-        padding: 50px 40px;
-        border-bottom: 1px solid #e0e0e0;
-    }
-    
-    .hero-heading {
-        color: #800000;
-        font-family: 'Georgia', serif;
-        font-size: 34px;
-        font-weight: bold;
-        margin-top: 0px;
-        margin-bottom: 16px;
-        letter-spacing: 0.5px;
-    }
-    
-    .hero-text {
-        font-size: 14px;
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        line-height: 1.6;
-        color: #666666;
-        font-weight: 400;
-        max-width: 900px;
-    }
+# 5. Secondary Floating Header Navigation
+logo_url = get_lpu_logo_url()
+campus_bg_url = get_lpu_campus_url()
 
-    /* Centered Section Styling */
-    .centered-section {
-        text-align: center;
-        padding: 50px 20px 20px 20px;
-        background-color: #ffffff;
-    }
-
-    .centered-title {
-        color: #333333;
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        font-size: 22px;
-        font-weight: bold;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        margin-bottom: 10px;
-    }
-
-    .centered-divider {
-        width: 80px;
-        height: 2px;
-        background-color: #444444;
-        margin: 0 auto 20px auto;
-    }
-
-    .centered-description {
-        color: #555555;
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        font-size: 15px;
-        line-height: 1.6;
-        max-width: 800px;
-        margin: 0 auto;
-    }
-
-    /* Fix Expander Text and Background Contrast */
-    [data-testid="stExpander"] {
-        background-color: #fdfbfb !important;
-        border: 1px solid #e0e0e0 !important;
-        border-radius: 6px !important;
-        margin-bottom: 10px !important;
-    }
-    [data-testid="stExpander"] summary p, 
-    [data-testid="stExpander"] span {
-        color: #333333 !important;
-        font-weight: 500 !important;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-# Query parameter router to handle single-page navigation seamlessly
-query_params = st.query_params
-current_page = query_params.get("page", "home")
-
-# 3. Top Deep Maroon Banner
-st.markdown(
-    '<div class="top-banner">'
-    '<span>LOVELY PROFESSIONAL UNIVERSITY</span>'
-    '<span class="support-box">24/7 CAMPUS SUPPORT +91 1824-444433 | 123 FROM CAMPUS PHONE</span>'
-    '</div>', 
-    unsafe_allow_html=True
+header_brand, header_spacer, header_nav = st.columns(
+    [3.2, 0.6, 6.2],
+    gap="small",
+    vertical_alignment="center"
 )
-# 4. Secondary Header Navigation Bar with Clean White Background & Spacing
-logo_img_tag = f'<img src="{logo_svg_url}" style="height: 40px; margin-right: 15px; object-fit: contain;" alt="LPU Logo">' if logo_svg_url else '<div style="color: #800000; font-family: Georgia, serif; font-size: 24px; font-weight: bold; margin-right: 15px;">LPU</div>'
 
-components.html(
-    f"""
-    <div style="background-color: #ffffff; border-bottom: 1px solid #e0e0e0; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0;">
-        <!-- Left Brand Logo & Title -->
-        <div style="display: flex; align-items: center;">
-            {logo_img_tag}
-            <span style="color: #800000; font-family: 'Georgia', serif; font-size: 24px; font-weight: bold; letter-spacing: 0.5px;">SHUTTLELYZE</span>
-        </div>
-        
-        <!-- Right Navigation Links: target="_blank" opens safety in a separate browser window/tab -->
-        <div style="display: flex; gap: 40px; align-items: center; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">
-            <a href="/safety" target="_blank" style="color: #444444; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#800000'" onmouseout="this.style.color='#444444'">Safety Resources</a>
-            <a href="/" target="_self" style="color: #444444; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#800000'" onmouseout="this.style.color='#444444'">Services</a>
-            <a href="/" target="_self" style="color: #444444; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#800000'" onmouseout="this.style.color='#444444'">News & Alerts</a>
-            <a href="/" target="_self" style="color: #444444; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#800000'" onmouseout="this.style.color='#444444'">About</a>
-            <a href="/" target="_self" style="color: #444444; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#800000'" onmouseout="this.style.color='#444444'">Contact</a>
-        </div>
-    </div>
-    """,
-    height=75
-)
-# --- PAGE ROUTING LOGIC ---
-if current_page == "safety":
-    safety_file_path = "C:/Users/ARYAN MAHAKUR/Desktop/VS CODE/INT395-CA1-PROJECT/pages/safety.py"
-    if os.path.exists(safety_file_path):
-        with open(safety_file_path, "r", encoding="utf-8") as f:
-            safety_code = f.read()
-        exec(safety_code, globals())
-    else:
-        st.error(f"Could not find safety file at: {safety_file_path}")
-else:
-    # HOME / OVERVIEW LANDING PAGE CONTENT
+with header_brand:
+    logo_html = f'<img src="{logo_url}" style="height: 44px; width: 44px; margin-right: 14px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(255,106,0,0.5));" alt="LPU Logo">' if logo_url else ''
     st.markdown(
-        '<div class="hero-container">'
-        '<div class="hero-heading">Shuttle Services</div>'
-        '<div class="hero-text">'
-        'The ShuttleLyze Program is a free campus transportation service provided by Lovely Professional University. '
-        'Daytime Shuttles and NightRide Shuttles travel on and around the greater campus area. '
-        'The shuttles run year-round, except on University-observed holidays. To ride the shuttles, passengers '
-        'are asked to tap a valid University-issued ID when boarding.'
-        '</div>'
-        '</div>',
-        unsafe_allow_html=True
-    )
-
-    st.markdown(
-        '<div class="centered-section">'
-        '<div class="centered-title">TRANSPORTATION AT LOVELY PROFESSIONAL UNIVERSITY</div>'
-        '<div class="centered-divider"></div>'
-        '<div class="centered-description">'
-        'Having reliable transportation options is an important part of staying safe. We have many ways to move safely around campus and the Phagwara area. '
-        'See the map for shuttle, train, and bus routes, EV bike sharing locations, and campus parking lots.'
-        '</div>'
-        '</div>',
-        unsafe_allow_html=True
-    )
-
-    # University Route Map Section
-    st.markdown('<div style="padding: 20px 40px 50px 40px; background-color: #ffffff;">', unsafe_allow_html=True)
-    _, center_container, _ = st.columns([0.15, 1.7, 0.15])
-
-    with center_container:
-        col_routes, col_map = st.columns([1, 1.2], gap="large")
-
-        with col_routes:
-            st.markdown(
-                """
-                <h3 style="color: #800000; font-family: 'Georgia', serif; font-size: 22px; margin-bottom: 15px;">
-                    LPU Campus Shuttle Routes
-                </h3>
-                <div style="font-size: 14px; color: #333333; line-height: 2.2; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
-                    <label style="display: block; cursor: pointer; border-bottom: 1px solid #eee; padding-bottom: 5px;">
-                        <input type="checkbox" checked="checked" style="accent-color: #800000; margin-right: 8px;"> <b>Block 1 to Block 57 Route</b><br>
-                        <span style="color: #666; font-size: 12px; margin-left: 20px;">Distance: 1,451.1 m | Avg Time: ~12 min</span>
-                    </label>
-                    <label style="display: block; cursor: pointer; border-bottom: 1px solid #eee; padding-top: 8px; padding-bottom: 5px;">
-                        <input type="checkbox" checked="checked" style="accent-color: #800000; margin-right: 8px;"> <b>Block 1 to Block 73 Route</b><br>
-                        <span style="color: #666; font-size: 12px; margin-left: 20px;">Distance: 1,620.0 m | Avg Time: ~14 min</span>
-                    </label>
-                    <label style="display: block; cursor: pointer; border-bottom: 1px solid #eee; padding-top: 8px; padding-bottom: 5px;">
-                        <input type="checkbox" checked="checked" style="accent-color: #800000; margin-right: 8px;"> <b>Block 1 to Block 48 Route</b><br>
-                        <span style="color: #666; font-size: 12px; margin-left: 20px;">Distance: 1,180.5 m | Avg Time: ~9 min</span>
-                    </label>
-                    <label style="display: block; cursor: pointer; padding-top: 8px;">
-                        <input type="checkbox" checked="checked" style="accent-color: #800000; margin-right: 8px;"> <b>Block 1 to Block 25 Route</b><br>
-                        <span style="color: #666; font-size: 12px; margin-left: 20px;">Distance: 885.2 m | Avg Time: ~7 min</span>
-                    </label>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-        with col_map:
-            components.html(
-                """
-                <div style="border: 2px solid #800000; border-radius: 6px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13715.1798369524!2d75.7001!3d31.2530!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x391a5f5e9c0c0c0d%3A0x7c7c7c7c7c7c7c7c!2sLovely%20Professional%20University!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" width="100%" height="320" style="border:0; display: block;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-                </div>
-                """,
-                height=330,
-            )
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # LPU Shuttle Basics Section
-    st.markdown('<div style="padding: 30px 40px 50px 40px; background-color: #ffffff;">', unsafe_allow_html=True)
-    _, center_container_basics, _ = st.columns([0.15, 1.7, 0.15])
-
-    with center_container_basics:
-        st.markdown(
-            """
-            <div style="text-align: center; margin-bottom: 30px;">
-                <div style="color: #333333; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 22px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;">
-                    We Know You Have Question's Right?
-                </div>
-                <div style="width: 80px; height: 2px; background-color: #444444; margin: 0 auto;"></div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-        with st.expander("Daytime Shuttle Schedule"):
-            st.write("Daytime shuttles operate from 8:00 AM to 10:00 AM, Monday to Sunday.")
-
-        with st.expander("NightRide Shuttle Schedule"):
-            st.write("NightRide shuttle operations continue until 10:00 PM.")
-
-        with st.expander("Tracking the movement of UGo Shuttles"):
-            st.write("You can use the LPU Golf Kart App for real-time tracking of shuttle movements across campus.")
-
-        with st.expander("Give feedback"):
-            st.write("Feedback options are available both on this website/portal and directly within the LPU Golf Kart App.")
-
-        with st.expander("Lost and Found"):
-            st.write("For any lost and found queries or reporting missing items, please visit ums.lpu.in.")
-
-        with st.expander("Using your ID to ride UGo shuttles"):
-            st.write("To ride UGo shuttles, simply ask the driver for ID verification and make the payment.")
-
-        with st.expander("How to request a Safety Escort"):
-            st.write("Each vehicle is equipped with an emergency alarm button and CCTV cameras for security. You can trigger the alarm or contact campus safety directly for immediate assistance.")
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # University Footer Section
-    components.html(
-        """
-        <div style="background-color: #800000; color: white; padding: 40px 50px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin-top: 40px;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 30px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 30px;">
-                <div style="flex: 1; min-width: 250px;">
-                    <h3 style="color: white; font-family: 'Georgia', serif; margin-top: 0; font-size: 20px;">ShuttleLyze</h3>
-                    <p style="font-size: 13px; line-height: 1.6; color: #f0f0f0; margin-bottom: 0;">
-                        Smart campus transportation analytics and route optimization system for Lovely Professional University. Ensuring safe and efficient transit across campus.
-                    </p>
-                </div>
-                <div style="flex: 1; min-width: 200px;">
-                    <h4 style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-top: 0; margin-bottom: 15px; color: #ffcccc;">Quick Links</h4>
-                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 13px; line-height: 2; color: white;">
-                        <li>Safety Resources</li>
-                        <li>Campus Transportation</li>
-                        <li>News & Alerts</li>
-                        <li>About ShuttleLyze</li>
-                    </ul>
-                </div>
-                <div style="flex: 1; min-width: 250px;">
-                    <h4 style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-top: 0; margin-bottom: 15px; color: #ffcccc;">Contact Support</h4>
-                    <p style="font-size: 13px; line-height: 1.6; color: #f0f0f0; margin: 0;">
-                        <b>Lovely Professional University</b><br>
-                        Phagwara, Punjab, 144411, India<br>
-                        Phone: +91 1824-444433 (Ext: 123)<br>
-                        Email: support@lpu.co.in
-                    </p>
-                </div>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 20px; font-size: 12px; color: #dddddd; flex-wrap: wrap; gap: 10px;">
-                <div>&copy; 2026 Lovely Professional University. All rights reserved. Developed for INT395-CA1-PROJECT.</div>
-                <div>Privacy Policy &nbsp;|&nbsp; Terms of Service &nbsp;|&nbsp; Campus Security</div>
+        f"""
+        <div style="display: flex; align-items: center; height: 65px; box-sizing: border-box; padding-left: 10px;">
+            {logo_html}
+            <div>
+                <span style="color: #FFFFFF; font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: 1.5px; line-height: 1;">
+                    SHUTTLE<span style="color: #FF6A00;">LYZE</span>
+                </span>
+                <div style="color: #B3B3B3; font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">LPU Transit Intelligence</div>
             </div>
         </div>
         """,
-        height=260
+        unsafe_allow_html=True
     )
+
+with header_nav:
+    nav1, nav2, nav3, nav4, nav5 = st.columns(
+        [1.3, 1.0, 1.3, 0.9, 0.9],
+        gap="small",
+        vertical_alignment="center"
+    )
+
+    with nav1:
+        if st.button("Safety Hub", key="nav_safety", use_container_width=True):
+            if os.path.exists("pages/Safety.py"):
+                st.switch_page("pages/Safety.py")
+            else:
+                st.warning("Safety page not found.")
+
+    with nav2:
+        if st.button("Services", key="nav_services", use_container_width=True):
+            if os.path.exists("pages/Services.py"):
+                st.switch_page("pages/Services.py")
+            else:
+                st.warning("Services page not found.")
+
+    with nav3:
+        if st.button("News & Alerts", key="nav_news", use_container_width=True):
+            if os.path.exists("pages/News.py"):
+                st.switch_page("pages/News.py")
+            else:
+                st.warning("News page not found.")
+
+    with nav4:
+        if st.button("About", key="nav_about", use_container_width=True):
+            if os.path.exists("pages/About.py"):
+                st.switch_page("pages/About.py")
+            else:
+                st.warning("About page not found.")
+
+    with nav5:
+        if st.button("Contact", key="nav_contact", use_container_width=True):
+            if os.path.exists("pages/Contact.py"):
+                st.switch_page("pages/Contact.py")
+            else:
+                st.warning("Contact page not found.")
+
+st.markdown('<div style="height: 10px;"></div>', unsafe_allow_html=True)
+
+# 6. Hero Section Showcasing LPU Campus Building
+bg_style = f"background-image: url('{campus_bg_url}');" if campus_bg_url else "background-color: #121212;"
+st.markdown(
+    f"""
+    <div class="lpu-hero-wrap">
+        <div class="lpu-hero-bg" style="{bg_style}"></div>
+        <div class="lpu-hero-overlay">
+            <div class="lpu-pill-badge">
+                <span style="font-size: 14px;">✦</span> Next-Gen Campus Transit • Lovely Professional University
+            </div>
+            <h1 class="lpu-hero-title">
+                Smart Autonomous Transit &<br>
+                <span>Predictive Fleet Intelligence</span>
+            </h1>
+            <p class="lpu-hero-desc">
+                The ShuttleLyze system orchestrates campus transportation at Lovely Professional University using real-time machine learning passenger demand forecasting, dynamic vehicle scheduling, and intelligent road routing across all 47 campus stations.
+            </p>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 106, 0, 0.15); border: 1px solid rgba(255, 106, 0, 0.4); padding: 8px 16px; border-radius: 8px; font-size: 13px; color: #FFFFFF; font-weight: 500;">
+                    <span style="color: #FF6A00; font-size: 16px;">⚡</span> Real-time AI Demand Prediction
+                </div>
+                <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); padding: 8px 16px; border-radius: 8px; font-size: 13px; color: #B3B3B3;">
+                    <span style="color: #FF6A00; font-size: 16px;">📍</span> 47 Campus Blocks Connected
+                </div>
+                <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); padding: 8px 16px; border-radius: 8px; font-size: 13px; color: #B3B3B3;">
+                    <span style="color: #FF6A00; font-size: 16px;">🛡️</span> 24/7 NightRide Security
+                </div>
+            </div>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# Quick Action Banner
+cta_col1, cta_col2 = st.columns(2, gap="medium")
+with cta_col1:
+    st.markdown(
+        """
+        <div class="lpu-card" style="margin-bottom: 0px; border-left: 3px solid #FF6A00;">
+            <div style="color: #FF6A00; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Interactive AI Dashboard</div>
+            <div style="color: #FFFFFF; font-size: 18px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; margin-bottom: 8px;">Run Route & Demand Prediction</div>
+            <p style="color: #B3B3B3; font-size: 13px; line-height: 1.6; margin-bottom: 15px;">
+                Calculate passenger loads, recommended shuttle frequencies, and road routing across any pair of campus blocks in real time.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    if st.button("🚀 Open Services & Analytics", key="btn_hero_services", use_container_width=True):
+        st.switch_page("pages/Services.py")
+
+with cta_col2:
+    st.markdown(
+        """
+        <div class="lpu-card" style="margin-bottom: 0px; border-left: 3px solid #CC4B00;">
+            <div style="color: #FF6A00; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Campus Safety & Security</div>
+            <div style="color: #FFFFFF; font-size: 18px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; margin-bottom: 8px;">NightRide & Escort Protocol</div>
+            <p style="color: #B3B3B3; font-size: 13px; line-height: 1.6; margin-bottom: 15px;">
+                Review vehicle CCTV monitoring, emergency alarm triggers, campus escort response desks, and 24/7 hotline resources.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    if st.button("🛡️ View Safety Protocols", key="btn_hero_safety", use_container_width=True):
+        st.switch_page("pages/Safety.py")
+
+st.markdown('<div style="height: 35px;"></div>', unsafe_allow_html=True)
+
+# 7. University Route Map Section
+st.markdown(
+    """
+    <div style="text-align: center; margin-bottom: 30px;">
+        <div class="lpu-pill-badge" style="margin-bottom: 10px;">LPU Campus Transit Map</div>
+        <h2 style="color: #FFFFFF; font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700; margin: 0 0 10px 0;">
+            Intra-Campus Shuttle Corridors & Stations
+        </h2>
+        <div style="width: 60px; height: 2px; background: #FF6A00; margin: 0 auto 12px auto; box-shadow: 0 0 10px #FF6A00;"></div>
+        <p style="color: #B3B3B3; font-size: 14px; max-width: 750px; margin: 0 auto; line-height: 1.6;">
+            Navigate high-frequency shuttle corridors connecting academic complexes, residential student hostels, dining hubs, and administrative zones.
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+col_routes, col_map = st.columns([1, 1.25], gap="large")
+
+with col_routes:
+    st.markdown(
+        """
+        <div class="lpu-card" style="height: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                <span style="color: #FFFFFF; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px;">Core Transit Corridors</span>
+                <span style="color: #FF6A00; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Active Routes</span>
+            </div>
+            <div style="font-size: 13px; line-height: 2.1;">
+                <div style="border-bottom: 1px solid rgba(255,255,255,0.06); padding: 8px 0;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <b style="color: #FFFFFF;">Block 1 ➔ Block 57 Corridor</b>
+                        <span style="color: #FF6A00; font-size: 12px; font-weight: 600;">~12 min</span>
+                    </div>
+                    <span style="color: #B3B3B3; font-size: 12px;">Distance: 1,451.1 m • High Demand</span>
+                </div>
+                <div style="border-bottom: 1px solid rgba(255,255,255,0.06); padding: 8px 0;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <b style="color: #FFFFFF;">Block 1 ➔ Block 73 Corridor</b>
+                        <span style="color: #FF6A00; font-size: 12px; font-weight: 600;">~14 min</span>
+                    </div>
+                    <span style="color: #B3B3B3; font-size: 12px;">Distance: 1,620.0 m • Peripheral Transit</span>
+                </div>
+                <div style="border-bottom: 1px solid rgba(255,255,255,0.06); padding: 8px 0;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <b style="color: #FFFFFF;">Block 1 ➔ Block 48 Corridor</b>
+                        <span style="color: #FF6A00; font-size: 12px; font-weight: 600;">~9 min</span>
+                    </div>
+                    <span style="color: #B3B3B3; font-size: 12px;">Distance: 1,180.5 m • Moderate Load</span>
+                </div>
+                <div style="padding: 8px 0;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <b style="color: #FFFFFF;">Block 1 ➔ Block 25 (CSE Dept)</b>
+                        <span style="color: #FF6A00; font-size: 12px; font-weight: 600;">~7 min</span>
+                    </div>
+                    <span style="color: #B3B3B3; font-size: 12px;">Distance: 885.2 m • Core Campus Hub</span>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+with col_map:
+    st.iframe(
+        "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13715.1798369524!2d75.7001!3d31.2530!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x391a5f5e9c0c0c0d%3A0x7c7c7c7c7c7c7c7c!2sLovely%20Professional%20University!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin",
+        height=350,
+    )
+
+st.markdown('<div style="height: 35px;"></div>', unsafe_allow_html=True)
+
+# 8. LPU Shuttle FAQ & Transit Schedules
+st.markdown(
+    """
+    <div style="text-align: center; margin-bottom: 25px;">
+        <div class="lpu-pill-badge" style="margin-bottom: 10px;">Information & Guidelines</div>
+        <h2 style="color: #FFFFFF; font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700; margin: 0 0 10px 0;">
+            Frequently Asked Questions & Transit Operations
+        </h2>
+        <div style="width: 50px; height: 2px; background: #FF6A00; margin: 0 auto; box-shadow: 0 0 8px #FF6A00;"></div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+with st.expander("🕒 Daytime Shuttle Schedule & Frequencies"):
+    st.write("Daytime shuttles operate from 8:00 AM to 10:00 PM, Monday through Sunday, with peak dispatch intervals of every 5-10 minutes during morning and evening rush hours.")
+
+with st.expander("🌙 NightRide Shuttle Security Operations"):
+    st.write("NightRide shuttles operate after 10:00 PM across all residential hostels and library complexes. Each vehicle is staffed with security-verified operators and real-time GPS tracking.")
+
+with st.expander("📍 Real-time Tracking via LPU Golf Kart App"):
+    st.write("Live vehicle GPS locations, estimated arrival times (ETAs), and passenger load indicators can be tracked in real-time through the official LPU Golf Kart Application.")
+
+with st.expander("💬 Passenger Feedback & Route Suggestions"):
+    st.write("Feedback can be submitted directly on the ShuttleLyze portal via the Contact page or within the mobile application to help improve route allocation.")
+
+with st.expander("🔍 Lost & Found Protocol"):
+    st.write("Items left on campus shuttles are delivered directly to the University Division of Student Affairs (DSA) and can be reported online at ums.lpu.in.")
+
+with st.expander("💳 Identification & Boarding Guidelines"):
+    st.write("Passengers must display their valid University Student/Staff ID when boarding university shuttles. Digital verification is integrated at terminal points.")
+
+with st.expander("🚨 Emergency Escort & Alarm Assistance"):
+    st.write("Each shuttle is fitted with an emergency panic alarm and continuous CCTV monitoring. For immediate security accompaniment across campus, contact Security Ext. 123.")
+
+# 9. University Footer
+render_cinematic_footer()

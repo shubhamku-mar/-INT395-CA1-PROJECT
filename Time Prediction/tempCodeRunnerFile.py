@@ -1,3 +1,4 @@
+import os
 
 import joblib
 import pandas as pd
@@ -6,10 +7,7 @@ import pandas as pd
 # 1. CONFIGURATION
 # ============================================================
 
-DATA_FILE = (
-    r"C:\Users\ARYAN MAHAKUR\Desktop\VS CODE"
-    r"\INT395-CA1-PROJECT\lpu_travel_time_model.pkl"
-)
+DATA_FILE = "lpu_travel_time_model.pkl" if os.path.exists("lpu_travel_time_model.pkl") else os.path.join(os.path.dirname(__file__), "..", "lpu_travel_time_model.pkl")
 
 # ============================================================
 # 2. LOAD SAVED DISTANCE AND TRAVEL TIME MATRICES

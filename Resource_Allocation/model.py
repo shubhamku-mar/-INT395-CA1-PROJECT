@@ -13,12 +13,7 @@ from sklearn.preprocessing import OneHotEncoder
 # ============================================================
 # 1. LOAD DATASET
 # ============================================================
-file_path = "LPU_Transportation_Master_Dataset_10000.xlsx"
-if not os.path.exists(file_path):
-    file_path = (
-        r"C:\Users\ARYAN MAHAKUR\Downloads\LPU_Transportation_Master_Dataset_10000"
-        " (1).xlsx"
-    )
+file_path = "LPU_Transportation_Master_Dataset_10000.xlsx" if os.path.exists("LPU_Transportation_Master_Dataset_10000.xlsx") else os.path.join(os.path.dirname(__file__), "..", "LPU_Transportation_Master_Dataset_10000.xlsx")
 
 print("Loading dataset...")
 df = pd.read_excel(file_path, sheet_name="Ride Records")

@@ -1,4 +1,4 @@
-
+import os
 import joblib
 import pandas as pd
 import numpy as np
@@ -7,10 +7,18 @@ import numpy as np
 # 1. CONFIGURATION
 # ============================================================
 
-DISTANCE_FILE = (
-    r"C:\Users\ARYAN MAHAKUR\Downloads"
-    r"\LPU_Distance_Matrix_Blocks (1).xlsx"
-)
+def get_distance_file():
+    candidates = [
+        "LPU_Distance_Matrix_Blocks.xlsx",
+        os.path.join(os.path.dirname(__file__), "..", "LPU_Distance_Matrix_Blocks.xlsx"),
+        "LPU_Distance_Matrix_Blocks.xlsx"
+    ]
+    for c in candidates:
+        if os.path.exists(c):
+            return c
+    return candidates[0]
+
+DISTANCE_FILE = get_distance_file()
 
 OUTPUT_MODEL = "lpu_travel_time_model.pkl"
 OUTPUT_DATA = "lpu_travel_time_training_data.csv"
@@ -21,7 +29,7 @@ AVERAGE_SPEED_KMPH = 17
 # 2. LOAD DISTANCE MATRIX
 # ============================================================
 
-print("Loading distance matrix...")
+print(f"Loading distance matrix from: {DISTANCE_FILE}...")
 
 raw = pd.read_excel(
     DISTANCE_FILE,

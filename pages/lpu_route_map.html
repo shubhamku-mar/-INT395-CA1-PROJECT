@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_4dd4b3d367a77f4d3406609a51aab8d4 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+
+</head>
+<body>
+
+
+            <div class="folium-map" id="map_4dd4b3d367a77f4d3406609a51aab8d4" ></div>
+
+</body>
+<script>
+
+
+            var map_4dd4b3d367a77f4d3406609a51aab8d4 = L.map(
+                "map_4dd4b3d367a77f4d3406609a51aab8d4",
+                {
+                    center: [31.25864811266902, 75.70873182477844],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 16,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+
+
+
+
+            var tile_layer_4a501ba6fa09ae47aa4bed326738ef38 = L.tileLayer(
+                "https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=cb1_4uc1_1_9e921e35e164b1723654c071",
+                {
+  "minZoom": 0,
+  "maxZoom": 18,
+  "maxNativeZoom": 18,
+  "noWrap": false,
+  "attribution": "\u00a9 OpenStreetMap contributors \u00a9 CARTO",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+
+
+            tile_layer_4a501ba6fa09ae47aa4bed326738ef38.addTo(map_4dd4b3d367a77f4d3406609a51aab8d4);
+
+
+            var marker_d2fab48bc607f095c06277b31b06d3f9 = L.marker(
+                [31.25864811266902, 75.70873182477844],
+                {
+}
+            ).addTo(map_4dd4b3d367a77f4d3406609a51aab8d4);
+
+
+            var icon_adb754d8bd385ad3254b82cce1e33dec = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "play",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+
+
+        var popup_a222bf16a291eaad13c65c74413242c0 = L.popup({
+  "maxWidth": "100%",
+});
+
+
+
+                var html_0bb6e82a4a29bb2dadc7e11be1ce7f1c = $(`<div id="html_0bb6e82a4a29bb2dadc7e11be1ce7f1c" style="width: 100.0%; height: 100.0%;">School of Fashion Design</div>`)[0];
+                popup_a222bf16a291eaad13c65c74413242c0.setContent(html_0bb6e82a4a29bb2dadc7e11be1ce7f1c);
+
+
+
+        marker_d2fab48bc607f095c06277b31b06d3f9.bindPopup(popup_a222bf16a291eaad13c65c74413242c0)
+        ;
+
+
+
+
+            marker_d2fab48bc607f095c06277b31b06d3f9.bindTooltip(
+                `<div>
+                     Pickup: 1
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+
+
+                marker_d2fab48bc607f095c06277b31b06d3f9.setIcon(icon_adb754d8bd385ad3254b82cce1e33dec);
+
+
+            var marker_c53348f1a893e1240d331360a0a3291f = L.marker(
+                [31.25471668572213, 75.70550635985425],
+                {
+}
+            ).addTo(map_4dd4b3d367a77f4d3406609a51aab8d4);
+
+
+            var icon_53503748a88e4fd844829601e56ff768 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "stop",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+
+
+        var popup_51c2986b50a305249a1623f3b9d98555 = L.popup({
+  "maxWidth": "100%",
+});
+
+
+
+                var html_bb432f84097e9ec2764cba2a2b2a5cbb = $(`<div id="html_bb432f84097e9ec2764cba2a2b2a5cbb" style="width: 100.0%; height: 100.0%;">School of Business / Management / Commerce & Economics</div>`)[0];
+                popup_51c2986b50a305249a1623f3b9d98555.setContent(html_bb432f84097e9ec2764cba2a2b2a5cbb);
+
+
+
+        marker_c53348f1a893e1240d331360a0a3291f.bindPopup(popup_51c2986b50a305249a1623f3b9d98555)
+        ;
+
+
+
+
+            marker_c53348f1a893e1240d331360a0a3291f.bindTooltip(
+                `<div>
+                     Drop: 14
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+
+
+                marker_c53348f1a893e1240d331360a0a3291f.setIcon(icon_53503748a88e4fd844829601e56ff768);
+
+
+            var poly_line_7b1b8b65b16e338a917eef17ec8e4176 = L.polyline(
+                [[31.258782, 75.708633], [31.258659, 75.708406], [31.258568, 75.707962], [31.258526, 75.707921], [31.258504, 75.707858], [31.258465, 75.70779], [31.258423, 75.70774], [31.258379, 75.707694], [31.258317, 75.70765], [31.258273, 75.707617], [31.258152, 75.707618], [31.25797, 75.70762], [31.257921, 75.707629], [31.257868, 75.707652], [31.25778, 75.707682], [31.257665, 75.707681], [31.257249, 75.707679], [31.257211, 75.707657], [31.25717, 75.707624], [31.257132, 75.707557], [31.257103, 75.707354], [31.257103, 75.706955], [31.257106, 75.706802], [31.257108, 75.706706], [31.25709, 75.706591], [31.256841, 75.706456], [31.256309, 75.706202], [31.256294, 75.706204], [31.256256, 75.706198], [31.25608, 75.706148], [31.256052, 75.706149], [31.256025, 75.706139], [31.256004, 75.706121], [31.255989, 75.706096], [31.255981, 75.706066], [31.255981, 75.706038], [31.255398, 75.705775], [31.254744, 75.705435]],
+                {"bubblingMouseEvents": true, "color": "purple", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "purple", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7}
+            ).addTo(map_4dd4b3d367a77f4d3406609a51aab8d4);
+
+
+            poly_line_7b1b8b65b16e338a917eef17ec8e4176.bindTooltip(
+                `<div>
+                     Shortest and fastest | 0.63 km | 2.1 minutes
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+
+
+            map_4dd4b3d367a77f4d3406609a51aab8d4.fitBounds(
+                [[31.25864811266902, 75.70873182477844], [31.25471668572213, 75.70550635985425]],
+                {"padding": [40, 40]}
+            );
+
+
+            var layer_control_e840967b34ea07c51214e693038116c6_layers = {
+                base_layers : {
+                    "CARTO Voyager" : tile_layer_4a501ba6fa09ae47aa4bed326738ef38,
+                },
+                overlays :  {
+                },
+            };
+            let layer_control_e840967b34ea07c51214e693038116c6 = L.control.layers(
+                layer_control_e840967b34ea07c51214e693038116c6_layers.base_layers,
+                layer_control_e840967b34ea07c51214e693038116c6_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": true,
+  "autoZIndex": true,
+}
+            ).addTo(map_4dd4b3d367a77f4d3406609a51aab8d4);
+
+
+</script>
+</html>

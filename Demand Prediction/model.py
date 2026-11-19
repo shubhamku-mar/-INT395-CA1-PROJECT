@@ -12,10 +12,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
 # 1. Load Dataset
-file_path = (
-    r"C:\Users\ARYAN MAHAKUR\Downloads"
-    r"\LPU_Campus_Demand_Prediction_Dataset_10000.xlsx"
-)
+file_path = "LPU_Campus_Demand_Prediction_Dataset_10000.xlsx" if os.path.exists("LPU_Campus_Demand_Prediction_Dataset_10000.xlsx") else "LPU_Transportation_Master_Dataset_10000.xlsx"
 TARGET_COLUMN = "Target_Passenger_Demand"
 
 df = pd.read_excel(file_path)

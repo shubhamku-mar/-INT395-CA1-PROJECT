@@ -1,26 +1,19 @@
-# Ignore images
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.svg
-
-# Ignore data files and datasets
-*.csv
-*.xlsx
-*.parquet
-*.json
-
-# Ignore model binary weights (optional, recommended if files are > 100MB)
-
-*.h5
-*.onnx
-*.pt
-*.pth
-
-# Ignore Python cached files and environment
+# Python cache
 __pycache__/
-*.pyc
-.env
+*.py[cod]
+
+# Virtual environments
 venv/
 .venv/
+
+# Secrets
+.env
+.streamlit/secrets.toml
+
+# Temporary files
+*.log
+
+.venv312/
+
+# Temporary VS Code files
+*tempCodeRunnerFile.py

@@ -1,0 +1,47 @@
+Pickup_Block,Pickup_Location_Name,Pickup_Location_Type,Total_Trips,Total_Passengers,Avg_Passengers
+12,Girl's Hostel 4,Hostel,311,3726,11.980707395498392
+BH4,Boys Hostel 4,Hostel,313,3252,10.389776357827476
+BH7,Boys Hostel 7,Hostel,295,3198,10.840677966101694
+BH6,Boys Hostel 6,Hostel,312,3142,10.070512820512821
+10,Girl's Hostel 2,Hostel,291,3125,10.738831615120274
+BH2,Boys Hostel 2,Hostel,301,3112,10.338870431893687
+BH1,Boys Hostel 1,Hostel,314,3082,9.815286624203821
+BH5,Boys Hostel 5,Hostel,317,3022,9.533123028391167
+9,Girl's Hostel 1,Hostel,281,3018,10.740213523131672
+BH3,Boys Hostel 3,Hostel,312,2918,9.352564102564102
+21A,Girl's Hostel 5,Hostel,296,2916,9.85135135135135
+Boys Apartments,Boys Apartments,Hostel,303,2850,9.405940594059405
+21B,Girl's Hostel 6,Hostel,282,2836,10.056737588652481
+11,Girl's Hostel 3,Hostel,268,2658,9.917910447761194
+8A,School of Architecture & Design,Academic,243,2461,10.127572016460906
+20,School of Law,Academic,219,2280,10.41095890410959
+26,Computer Science / CSE area,Academic,230,2238,9.730434782608695
+31,Computer Science / CSE area,Academic,228,2206,9.675438596491228
+30,Computer Science / CSE area,Academic,237,2158,9.10548523206751
+14,School of Business / Management / Commerce & Economics,Academic,229,2146,9.37117903930131
+32,Computer Science / CSE area,Academic,228,2117,9.285087719298245
+38,Computer Science / CSE area,Academic,204,2109,10.338235294117647
+29,Computer Science / CSE area,Academic,221,2104,9.520361990950226
+15A,Unicenter,Academic,216,2090,9.675925925925926
+35,Computer Science / CSE area,Academic,207,2066,9.980676328502415
+37,Computer Science / CSE area,Academic,238,2063,8.668067226890756
+1,School of Fashion Design,Academic,205,2054,10.019512195121951
+34,Computer Science / CSE area,Academic,201,2039,10.144278606965175
+33,Computer Science / CSE area,Academic,208,2012,9.673076923076923
+15B,School of Hotel Management,Academic,221,2001,9.054298642533936
+27,Computer Science / CSE area,Academic,222,1977,8.905405405405405
+18,School of Arts & Languages / Physical Education / Education,Academic,237,1950,8.227848101265822
+25,Computer Science / CSE area,Academic,220,1936,8.8
+28,Computer Science / CSE area,Academic,220,1801,8.186363636363636
+8B,School of Pharmacy,Academic,209,1737,8.311004784688995
+36,Computer Science / CSE area,Academic,207,1688,8.154589371980677
+Boys Studio 12,Boys Studio 12,Hostel,124,1226,9.887096774193548
+Boys Studio 11,Boys Studio 11,Hostel,113,1223,10.823008849557523
+Boys Studio 13,Boys Studio 13,Hostel,120,1159,9.658333333333333
+2 / 02A,Mini Auditorium,Academic,92,937,10.184782608695652
+56B,56B,Academic,95,880,9.263157894736842
+3 / 03A,School of Paramedical Sciences / Electrical Works / Director General Office,Academic,91,834,9.164835164835164
+57,School of Polytechnic,Academic,86,777,9.034883720930232
+19,Sh. Baldev Raj Mittal Main Stage,Academic,86,772,8.976744186046512
+8C,Uni Hospital / Fine Arts / Animation,Academic,80,748,9.35
+13,Division of Student Affairs,Academic,67,711,10.611940298507463

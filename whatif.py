@@ -7,12 +7,11 @@ import pandas as pd
 def load_model_and_data():
     """Loads the trained ML pipeline and master dataset."""
     model_file = "demand_prediction_pipeline.pkl"
+    if not os.path.exists(model_file):
+        model_file = os.path.join(os.path.dirname(__file__), "demand_prediction_pipeline.pkl")
     data_file = "LPU_Transportation_Master_Dataset_10000.xlsx"
     if not os.path.exists(data_file):
-        data_file = (
-            r"C:\Users\ARYAN MAHAKUR\Downloads\LPU_Transportation_Master_Dataset_10000"
-            " (1).xlsx"
-        )
+        data_file = os.path.join(os.path.dirname(__file__), "LPU_Transportation_Master_Dataset_10000.xlsx")
 
     try:
         pipeline = joblib.load(model_file)
@@ -254,7 +253,7 @@ def run_what_if_simulation():
         print("-" * 65)
         print(f"📊 Baseline Predicted Demand (Normal Conditions): {baseline_pred:.2f} passengers")
         print(f"🔮 Simulated Predicted Demand (What-If Scenario):  {sim_pred:.2f} passengers")
-        
+
         diff = sim_pred - baseline_pred
         pct_change = (diff / baseline_pred) * 100 if baseline_pred > 0 else 0
         print(f"📈 Net Demand Shift: {diff:+.2f} passengers ({pct_change:+.1f}%)")
