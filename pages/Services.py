@@ -295,7 +295,7 @@ sel_col1, sel_col2 = st.columns(2, gap="medium")
 with sel_col1:
     st.markdown(
         "<span style='font-size:12px;font-weight:bold;color:#333;'>"
-        "ðŸ“ Select Pickup Location</span>",
+        " Select Pickup Location</span>",
         unsafe_allow_html=True,
     )
 
@@ -309,7 +309,7 @@ with sel_col1:
 with sel_col2:
     st.markdown(
         "<span style='font-size:12px;font-weight:bold;color:#333;'>"
-        "ðŸ Select Drop Location</span>",
+        " Select Drop Location</span>",
         unsafe_allow_html=True,
     )
 
@@ -323,7 +323,7 @@ with sel_col2:
 st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
 
 run_analysis = st.button(
-    "ðŸš€ Run Complete Shuttle & Route Analysis",
+    " Run Complete Shuttle & Route Analysis",
     use_container_width=True,
 )
 
@@ -339,7 +339,7 @@ st.markdown(
                 color:#333;">
         <b>Route Overview:</b>
         <span class="route-badge">{pickup_location}</span>
-        âž”
+        →
         <span class="route-badge">{drop_location}</span>
     </div>
     """,
@@ -439,7 +439,7 @@ def make_demand_input(
         "Drop_Block": str(drop["ID"]),
         "Drop_Location_Name": str(drop["Name"]),
         "Drop_Location_Type": str(drop["Type"]),
-        "Route": f"{pickup['ID']} â†’ {drop['ID']}",
+        "Route": f"{pickup['ID']} → {drop['ID']}",
         "Day_of_Week": now.strftime("%A"),
         "Is_Weekend": "Yes" if now.weekday() >= 5 else "No",
         "Month": now.strftime("%B"),
@@ -603,7 +603,7 @@ if run_analysis:
 
     pickup_id, pickup_name = split_location(pickup_location)
     drop_id, drop_name = split_location(drop_location)
-    route_str = f"{pickup_id} â†’ {drop_id}"
+    route_str = f"{pickup_id} → {drop_id}"
 
     # Find history for the selected route. If the route has no matching
     # rows, use the actual campus dataset, as the original runner does.
@@ -860,7 +860,7 @@ if run_analysis:
     analytics_col, map_col = st.columns([1.15, 1], gap="large")
 
     with analytics_col:
-        st.caption(f"{pickup_name} â†’ {drop_name}")
+        st.caption(f"{pickup_name} → {drop_name}")
 
         # New travel-time model output. This reads the saved matrices directly;
         # it does not train a model or use hardcoded travel results.
@@ -1179,7 +1179,7 @@ if run_analysis:
             )
 
             st.download_button(
-                "ðŸ“¥ Download Route Map (HTML)",
+                " Download Route Map (HTML)",
                 data=route_map_html,
                 file_name="lpu_route_map.html",
                 mime="text/html",
@@ -1190,7 +1190,7 @@ if run_analysis:
                 st.markdown(
                     '<div class="analysis-card">'
                     '<b>Shortest route</b><br>'
-                    f'{shortest["distance"] / 1000:.3f} km Â· '
+                    f'{shortest["distance"] / 1000:.3f} km · '
                     f'{shortest["duration"] / 60:.2f} minutes'
                     '</div>',
                     unsafe_allow_html=True,
@@ -1200,7 +1200,7 @@ if run_analysis:
                 st.markdown(
                     '<div class="analysis-card">'
                     '<b>Fastest route</b><br>'
-                    f'{fastest["distance"] / 1000:.3f} km Â· '
+                    f'{fastest["distance"] / 1000:.3f} km · '
                     f'{fastest["duration"] / 60:.2f} minutes'
                     '</div>',
                     unsafe_allow_html=True,
@@ -1385,9 +1385,9 @@ else:
         st.markdown(
             '<div class="analysis-card"><b>Scenario result</b><br>'
             f'<b>Location:</b> {whatif_location_name}<br>'
-            f'<b>Route used by model:</b> {whatif_location_name} â†’ {whatif_drop_name}<br>'
+            f'<b>Route used by model:</b> {whatif_location_name} → {whatif_drop_name}<br>'
             f'<b>Distance:</b> {float(whatif_distance):,.2f} m<br>'
-            f'<b>Conditions:</b> Traffic {whatif_traffic} Â· Weather {whatif_weather} Â· '
+            f'<b>Conditions:</b> Traffic {whatif_traffic} · Weather {whatif_weather} · '
             f'Peak hour {whatif_peak}<br>'
             f'<b>Planning insight:</b> {whatif_advice}'
             '</div>',
