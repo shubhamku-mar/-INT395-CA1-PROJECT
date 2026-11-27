@@ -127,7 +127,7 @@ def send_otp(email, otp):
         except Exception:
             details = "(Brevo returned a non-JSON error response)"
 
-        print(f"[OTP] Brevo HTTP {exc.code}; details: {details}")
+        print(f"[OTP] Brevo HTTP {exc.code}; details: {details}", flush=True)
         raise RuntimeError(
             f"Brevo rejected the request (HTTP {exc.code}). "
             "Check Render Logs for the Brevo error details."
