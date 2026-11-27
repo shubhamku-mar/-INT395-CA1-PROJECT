@@ -765,7 +765,7 @@ class GPSHandler(BaseHTTPRequestHandler):
                 email = str(data.get("email", "")).strip().lower()
 
                 if len(email) > 254 or not re.fullmatch(
-                    r"[^@\\s]+@[^@\\s]+\\.[^@\\s]+", email
+                    r"[^@\s]+@[^@\s]+\.[^@\s]+", email
                 ):
                     self.send_json(400, {"error": "Enter a valid email address."})
                     return
@@ -812,7 +812,7 @@ class GPSHandler(BaseHTTPRequestHandler):
                 otp = str(data.get("otp", "")).strip()
 
                 if (
-                    not re.fullmatch(r"[^@\\s]+@[^@\\s]+\\.[^@\\s]+", email)
+                    not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email)
                     or not otp.isdigit() or len(otp) != 6
                 ):
                     self.send_json(400, {
