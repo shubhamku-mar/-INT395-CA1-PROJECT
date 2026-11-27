@@ -1,5 +1,6 @@
 import os
 import streamlit as st
+from app_auth import require_app_login
 from assets.frontend_theme import (
     inject_lpu_theme,
     render_top_banner,
@@ -13,6 +14,9 @@ st.set_page_config(
     page_icon="🚌",
     layout="wide",
 )
+
+# Require separate email OTP before opening this application page.
+require_app_login()
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 CLUSTER_IMAGE = os.path.join(PROJECT_ROOT, "lpu_location_clusters_plot.png")
