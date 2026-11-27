@@ -85,7 +85,7 @@ def require_app_login():
         }}
         .st-key-shuttlelyze-login-panel [data-testid="stTextInput"] label {{
             color: #000000 !important;
-            font-size: 0.86rem !important;
+            font-size: calc(0.86rem + 2px) !important;
             font-weight: 800 !important;
         }}
         .st-key-shuttlelyze-login-panel [data-testid="stTextInput"] input {{
@@ -94,7 +94,8 @@ def require_app_login():
             border-radius: 8px !important;
             color: #ff8a24 !important;
             font-weight: 750 !important;
-            min-height: 38px;
+            font-size: calc(1rem + 2px) !important;
+            min-height: 40px;
         }}
         .st-key-shuttlelyze-login-panel [data-testid="stTextInput"] input::placeholder {{
             color: #ff9a3d !important;
@@ -102,7 +103,8 @@ def require_app_login():
             font-weight: 700 !important;
         }}
         .st-key-shuttlelyze-login-panel [data-testid="stButton"] button {{
-            min-height: 42px;
+            min-height: 44px;
+            font-size: calc(1rem + 2px) !important;
             border: 1px solid rgba(255,255,255,0.52) !important;
             border-radius: 8px !important;
             background: rgba(255,255,255,0.055) !important;
@@ -146,7 +148,7 @@ def require_app_login():
                         box-shadow:0 0 18px rgba(0,0,0,.18);
                         position:relative;">
                         <div style="
-                            font-size:clamp(28px,2.6vw,40px);
+                            font-size:clamp(30px,calc(2.6vw + 2px),42px);
                             line-height:1.2;
                             font-weight:950;
                             letter-spacing:1.6px;
@@ -162,10 +164,10 @@ def require_app_login():
                         border-bottom:2px solid rgba(255,255,255,.42);
                         border-radius:0 0 8px 8px;">
                     </div>
-                    <h2 style="color:#000000; margin:0 0 10px; font-size:22px; font-weight:950; letter-spacing:.2px; text-shadow:0 1px 5px rgba(255,255,255,.55);">
+                    <h2 style="color:#000000; margin:0 0 10px; font-size:24px; font-weight:950; letter-spacing:.2px; text-shadow:0 1px 5px rgba(255,255,255,.55);">
                         Email OTP Login
                     </h2>
-                    <p style="color:#000000; margin:0; font-size:13px; line-height:1.5; font-weight:850; text-shadow:0 1px 5px rgba(255,255,255,.55);">
+                    <p style="color:#000000; margin:0; font-size:15px; line-height:1.5; font-weight:850; text-shadow:0 1px 5px rgba(255,255,255,.55);">
                         Verify your email to open the SHUTTLELYZE application.
                     </p>
                 </div>
