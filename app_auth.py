@@ -143,12 +143,9 @@ def require_app_login():
                             line-height:1.2;
                             font-weight:950;
                             letter-spacing:1.6px;
-                            text-shadow:0 2px 14px rgba(0,0,0,.38);
+                            text-shadow:0 2px 12px rgba(0,0,0,.28);
                             padding:8px 2px;
-                            background:linear-gradient(90deg,#ff8738 0%,#fff1e5 72%);
-                            -webkit-background-clip:text;
-                            background-clip:text;
-                            color:transparent;">
+                            color:#ff7900;">
                             SHUTTLELYZE
                         </div>
                     </div>
@@ -158,10 +155,10 @@ def require_app_login():
                         border-bottom:2px solid rgba(255,255,255,.42);
                         border-radius:0 0 8px 8px;">
                     </div>
-                    <h2 style="color:#ffffff; margin:0 0 10px; font-size:22px; font-weight:900; letter-spacing:.2px; text-shadow:0 2px 10px rgba(0,0,0,.55);">
+                    <h2 style="color:#000000; margin:0 0 10px; font-size:22px; font-weight:950; letter-spacing:.2px; text-shadow:0 1px 5px rgba(255,255,255,.55);">
                         Email OTP Login
                     </h2>
-                    <p style="color:#ffffff; margin:0; font-size:13px; line-height:1.5; font-weight:700; text-shadow:0 1px 7px rgba(0,0,0,.7);">
+                    <p style="color:#000000; margin:0; font-size:13px; line-height:1.5; font-weight:850; text-shadow:0 1px 5px rgba(255,255,255,.55);">
                         Verify your email to open the SHUTTLELYZE application.
                     </p>
                 </div>
