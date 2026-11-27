@@ -168,7 +168,27 @@ with cta_col2:
     if st.button("🛡️ View Safety Protocols", key="btn_hero_safety", use_container_width=True):
         st.switch_page("pages/Safety.py")
 
-st.markdown('<div style="height: 35px;"></div>', unsafe_allow_html=True)
+st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
+
+# Live GPS Dashboard — separate cloud tracking service
+st.markdown(
+    '''
+    <div class="lpu-card" style="margin-bottom: 25px; border-left: 3px solid #FF6A00; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+        <div>
+            <div style="color: #FF6A00; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Live Fleet Tracking</div>
+            <div style="color: #FFFFFF; font-size: 18px; font-weight: 700;">Real-Time Shuttle GPS Dashboard</div>
+            <div style="color: #B3B3B3; font-size: 13px; margin-top: 6px;">Monitor live shuttle locations through the secure cloud tracking system.</div>
+        </div>
+        <a href="https://shuttlelyze-gps-cloud.onrender.com/dashboard" target="_blank" rel="noopener noreferrer"
+           style="display: inline-block; background: #FF6A00; color: #FFFFFF; padding: 11px 20px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 13px;">
+            📍 Open Live GPS Dashboard ↗
+        </a>
+    </div>
+    ''',
+    unsafe_allow_html=True
+)
+
+st.markdown('<div style="height: 15px;"></div>', unsafe_allow_html=True)
 
 # 7. University Route Map Section
 st.markdown(
