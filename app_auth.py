@@ -63,14 +63,25 @@ def require_app_login():
         }}
         .st-key-shuttlelyze-login-panel {{
             box-sizing: border-box;
-            width: 100%;
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10;
+            width: clamp(350px, 28.5vw, 455px);
+            height: 100vh;
             min-height: 100vh;
-            padding: clamp(44px, 8vh, 86px) 1.15rem 2rem;
-            background: linear-gradient(160deg, rgba(22, 39, 52, 0.78), rgba(8, 27, 36, 0.82));
+            overflow-y: auto;
+            padding: clamp(34px, 6vh, 64px) 1.05rem 1.5rem;
+            margin: 0 !important;
+            background: linear-gradient(160deg, rgba(22, 39, 52, 0.80), rgba(8, 27, 36, 0.86));
             border-left: 1px solid rgba(255,255,255,0.28);
-            border-right: 1px solid rgba(255,255,255,0.18);
+            border-right: 0;
+            border-top: 0;
+            border-bottom: 0;
+            border-radius: 0;
             backdrop-filter: blur(9px);
-            box-shadow: 0 0 55px rgba(0,0,0,0.28);
+            box-shadow: -12px 0 42px rgba(0,0,0,0.24);
         }}
         .st-key-shuttlelyze-login-panel [data-testid="stTextInput"] label {{
             color: #f5f5f5 !important;
@@ -81,7 +92,7 @@ def require_app_login():
             border: 1px solid rgba(255,255,255,0.48) !important;
             border-radius: 8px !important;
             color: #ffffff !important;
-            min-height: 42px;
+            min-height: 38px;
         }}
         .st-key-shuttlelyze-login-panel [data-testid="stTextInput"] input::placeholder {{
             color: rgba(255,255,255,0.78) !important;
@@ -98,19 +109,13 @@ def require_app_login():
             color: #ffb17c !important;
         }}
         @media (max-width: 850px) {{
-            [data-testid="stHorizontalBlock"] {{
-                min-height: auto;
-            }}
-            [data-testid="stColumn"]:first-child {{
-                display: none !important;
-            }}
+            [data-testid="stHorizontalBlock"] {{ min-height: 100vh; }}
+            [data-testid="stColumn"]:first-child {{ display: none !important; }}
             .st-key-shuttlelyze-login-panel {{
-                width: min(100%, 560px);
-                min-height: auto;
-                margin: 20px auto !important;
-                padding: 1.5rem 1.15rem 1.8rem;
-                border: 1px solid rgba(255,255,255,0.25);
-                border-radius: 16px;
+                position: relative; top: auto; right: auto; bottom: auto;
+                width: min(100%, 560px); height: auto; min-height: 100vh;
+                margin: 0 auto !important; padding: 2rem 1.15rem;
+                border: 1px solid rgba(255,255,255,0.25); border-radius: 0;
             }}
         }}
         </style>
@@ -118,7 +123,7 @@ def require_app_login():
         unsafe_allow_html=True,
     )
 
-    left_col, right_col = st.columns([1.0, 0.50], gap="small")
+    left_col, right_col = st.columns([1.0, 0.42], gap=None)
     with left_col:
         st.empty()
 
@@ -126,19 +131,19 @@ def require_app_login():
         with st.container(key="shuttlelyze-login-panel"):
             st.markdown(
                 """
-                <div style="text-align:center; margin:0 0 34px;">
+                <div style="text-align:center; margin:0 0 24px;">
                     <div style="
                         border:1px solid rgba(255,255,255,.34);
                         border-radius:8px;
-                        padding:14px 5px 24px;
+                        padding:10px 5px 16px;
                         box-shadow:0 0 18px rgba(0,0,0,.18);
                         position:relative;">
                         <div style="
-                            font-size:clamp(32px,3.1vw,48px);
+                            font-size:clamp(28px,2.6vw,40px);
                             line-height:1.2;
                             font-weight:900;
                             letter-spacing:1px;
-                            padding:10px 2px;
+                            padding:8px 2px;
                             background:linear-gradient(90deg,#ff8738 0%,#fff1e5 72%);
                             -webkit-background-clip:text;
                             background-clip:text;
@@ -148,11 +153,11 @@ def require_app_login():
                     </div>
                     <div style="
                         height:10px;
-                        margin:-1px 18px 20px;
+                        margin:-1px 18px 15px;
                         border-bottom:2px solid rgba(255,255,255,.42);
                         border-radius:0 0 8px 8px;">
                     </div>
-                    <h2 style="color:white; margin:0 0 10px; font-size:21px;">
+                    <h2 style="color:white; margin:0 0 10px; font-size:19px;">
                         Email OTP Login
                     </h2>
                     <p style="color:#E0E4E8; margin:0; font-size:13px; line-height:1.5;">
