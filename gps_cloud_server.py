@@ -384,18 +384,31 @@ function renderHistory(items){
  '</tr>').join('');
 }
 async function loadHistory(){
- if(!dashboardKey){document.getElementById("historyStatus").textContent="Connect with your dashboard key first.";return;}
+ const historyStatus=document.getElementById("historyStatus");
+ historyStatus.textContent="Loading device history...";
+ if(!dashboardKey){
+  historyStatus.textContent="Not connected. Enter the dashboard access key and click CONNECT first.";
+  setStatus("Device history is locked. Connect with your dashboard access key first.");
+  document.getElementById("history").scrollIntoView({behavior:"smooth",block:"start"});
+  return;
+ }
+ setStatus("Loading the last 10 GPS records...");
  try{
   const response=await fetch("/api/history",{
    headers:{"X-Dashboard-Key":dashboardKey},cache:"no-store"
   });
   const result=await response.json();
-  if(!response.ok)throw new Error(result.error||"Could not load history");
+  if(!response.ok)throw new Error(result.error||("HTTP "+response.status));
   renderHistory(result.history||[]);
-  document.getElementById("historyStatus").textContent=
-   "Showing the 10 most recent GPS records. Previous sessions are included.";
+  historyStatus.textContent=result.history&&result.history.length
+   ? "Showing "+result.history.length+" most recent GPS records, including previous sessions."
+   : "No GPS records found for this device yet. Start GPS tracking on the phone first.";
+  setStatus("Device history loaded successfully.");
+  document.getElementById("history").scrollIntoView({behavior:"smooth",block:"start"});
  }catch(e){
-  document.getElementById("historyStatus").textContent="History error: "+e.message;
+  historyStatus.textContent="History error: "+e.message;
+  setStatus("Device history failed: "+e.message);
+  document.getElementById("history").scrollIntoView({behavior:"smooth",block:"start"});
  }
 }
 async function resetLocation(){
@@ -464,14 +477,33 @@ async function refresh(){
   setStatus("Dashboard error: "+e.message);
  }
 }
-function connect(){
- dashboardKey=document.getElementById("key").value.trim();
- if(!dashboardKey){setStatus("Enter the dashboard access key.");return;}
- if(timer)clearInterval(timer);
- setupMap();
- refresh();
- loadHistory();
- timer=setInterval(refresh,2000);
+async function connect(){
+ const enteredKey=document.getElementById("key").value.trim();
+ if(!enteredKey){setStatus("Enter the dashboard access key, then click CONNECT.");return;}
+ dashboardKey=enteredKey;
+ setStatus("Checking dashboard access...");
+ try{
+  const response=await fetch("/api/latest",{
+   headers:{"X-Dashboard-Key":dashboardKey},cache:"no-store"
+  });
+  const result=await response.json();
+  if(!response.ok)throw new Error(result.error||("HTTP "+response.status));
+  if(timer)clearInterval(timer);
+  setupMap();
+  setStatus("Connected successfully. Loading GPS data and device history...");
+  renderHistory(result.history||[]);
+  document.getElementById("historyStatus").textContent=
+   result.history&&result.history.length
+    ? "Showing "+result.history.length+" most recent GPS records."
+    : "No GPS records found yet. Start GPS tracking on the phone.";
+  await refresh();
+  await loadHistory();
+  timer=setInterval(refresh,2000);
+ }catch(e){
+  dashboardKey="";
+  if(timer){clearInterval(timer);timer=null;}
+  setStatus("Connection failed: "+e.message+" Check the access key and try again.");
+ }
 }
 </script>
 </body>
