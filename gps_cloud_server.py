@@ -339,8 +339,8 @@ th{color:#fb923c}
 <p class="muted" id="historyStatus">Connect to load recent GPS records.</p>
 <div class="history-wrap">
 <table>
-<thead><tr><th>#</th><th>Date &amp; Time</th><th>Latitude</th><th>Longitude</th><th>Accuracy</th><th>Speed</th></tr></thead>
-<tbody id="historyRows"><tr><td colspan="6" class="empty">No history loaded.</td></tr></tbody>
+<thead><tr><th>#</th><th>User / Email</th><th>Date &amp; Time</th><th>Latitude</th><th>Longitude</th><th>Accuracy</th><th>Speed</th></tr></thead>
+<tbody id="historyRows"><tr><td colspan="7" class="empty">No history loaded.</td></tr></tbody>
 </table>
 </div>
 </div>
@@ -368,14 +368,20 @@ function clearLiveDisplay(){
  if(trail){map.removeLayer(trail);trail=null;}
  if(accuracyCircle){map.removeLayer(accuracyCircle);accuracyCircle=null;}
 }
+function escapeHtml(value){
+ return String(value).replace(/[&<>"']/g,ch=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[ch]));
+}
 function renderHistory(items){
  const body=document.getElementById("historyRows");
  if(!items||!items.length){
-  body.innerHTML='<tr><td colspan="6" class="empty">No GPS history available yet.</td></tr>';
+  body.innerHTML='<tr><td colspan="7" class="empty">No GPS history available yet.</td></tr>';
   return;
  }
  body.innerHTML=items.map((p,index)=>'<tr>'+
   '<td>'+(index+1)+'</td>'+
+  '<td>'+escapeHtml(p.email||"Unknown user")+'</td>'+
   '<td>'+new Date(p.recorded_at).toLocaleString()+'</td>'+
   '<td>'+Number(p.latitude).toFixed(6)+'</td>'+
   '<td>'+Number(p.longitude).toFixed(6)+'</td>'+
@@ -620,7 +626,7 @@ class GPSHandler(BaseHTTPRequestHandler):
                     """, (email, session_id)).fetchall() if session_id else []
 
                     history = conn.execute("""
-                        SELECT latitude,longitude,accuracy,speed,recorded_at
+                        SELECT email,latitude,longitude,accuracy,speed,recorded_at
                         FROM gps_locations
                         WHERE email=%s
                         ORDER BY id DESC LIMIT 10
@@ -673,16 +679,16 @@ class GPSHandler(BaseHTTPRequestHandler):
                         self.send_json(200, {"history": []})
                         return
                     rows = conn.execute("""
-                        SELECT latitude,longitude,accuracy,speed,recorded_at
+                        SELECT email,latitude,longitude,accuracy,speed,recorded_at
                         FROM gps_locations
                         WHERE email=%s
                         ORDER BY id DESC LIMIT 10
                     """, (device[0],)).fetchall()
                 history = [
                     {
-                        "latitude": row[0], "longitude": row[1],
-                        "accuracy": row[2], "speed": row[3],
-                        "recorded_at": row[4].isoformat()
+                        "email": row[0], "latitude": row[1], "longitude": row[2],
+                        "accuracy": row[3], "speed": row[4],
+                        "recorded_at": row[5].isoformat()
                     }
                     for row in rows
                 ]
