@@ -1357,10 +1357,7 @@ select.addEventListener("change",()=>{if(timer)refresh(true).catch(e=>status("Ro
     _live_tracker_html = _live_tracker_html.replace("__LOCATIONS__", _live_locations_json)
     components.html(_live_tracker_html, height=760, scrolling=True)
 else:
-    st.warning(
-        "Live destination tracking needs the LPU location workbook with valid Latitude and Longitude columns. "
-        "The existing route analytics above are not affected."
-    )
+    pass
 
 
 # 12. WHAT-IF DEMAND SIMULATION
