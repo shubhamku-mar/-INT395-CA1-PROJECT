@@ -98,6 +98,16 @@ def init_db():
             )
         """)
         conn.execute("""
+            CREATE TABLE IF NOT EXISTS gps_app_otp_challenges (
+                email TEXT PRIMARY KEY,
+                otp_hash TEXT NOT NULL,
+                salt TEXT NOT NULL,
+                expires_at DOUBLE PRECISION NOT NULL,
+                sent_at DOUBLE PRECISION NOT NULL,
+                attempts INTEGER NOT NULL DEFAULT 0
+            )
+        """)
+        conn.execute("""
             CREATE TABLE IF NOT EXISTS gps_device_tokens (
                 token_hash TEXT PRIMARY KEY,
                 email TEXT NOT NULL,
@@ -748,6 +758,118 @@ class GPSHandler(BaseHTTPRequestHandler):
                     "message": "New tracking session started.",
                     "session_started_at": now.isoformat()
                 })
+                return
+
+            if path == "/api/app/request-otp":
+                data = self.read_json()
+                email = str(data.get("email", "")).strip().lower()
+
+                if len(email) > 254 or not re.fullmatch(
+                    r"[^@\\s]+@[^@\\s]+\\.[^@\\s]+", email
+                ):
+                    self.send_json(400, {"error": "Enter a valid email address."})
+                    return
+
+                now = time.time()
+                with db() as conn:
+                    old = conn.execute("""
+                        SELECT sent_at FROM gps_app_otp_challenges WHERE email=%s
+                    """, (email,)).fetchone()
+
+                if old and now - old[0] < RESEND_SECONDS:
+                    self.send_json(429, {
+                        "error": "Please wait before requesting another application OTP."
+                    })
+                    return
+
+                otp = f"{secrets.randbelow(1000000):06d}"
+                salt = secrets.token_hex(16)
+                digest = hashlib.sha256(
+                    f"{email}:{otp}:{salt}".encode()
+                ).hexdigest()
+
+                send_otp(email, otp)
+
+                with db() as conn:
+                    conn.execute("""
+                        INSERT INTO gps_app_otp_challenges
+                        (email,otp_hash,salt,expires_at,sent_at,attempts)
+                        VALUES(%s,%s,%s,%s,%s,0)
+                        ON CONFLICT(email) DO UPDATE SET
+                        otp_hash=EXCLUDED.otp_hash,
+                        salt=EXCLUDED.salt,
+                        expires_at=EXCLUDED.expires_at,
+                        sent_at=EXCLUDED.sent_at,
+                        attempts=0
+                    """, (email, digest, salt, now + OTP_SECONDS, now))
+
+                self.send_json(200, {"success": True})
+                return
+
+            if path == "/api/app/verify-otp":
+                data = self.read_json()
+                email = str(data.get("email", "")).strip().lower()
+                otp = str(data.get("otp", "")).strip()
+
+                if (
+                    not re.fullmatch(r"[^@\\s]+@[^@\\s]+\\.[^@\\s]+", email)
+                    or not otp.isdigit() or len(otp) != 6
+                ):
+                    self.send_json(400, {
+                        "error": "Enter a valid email and six-digit OTP."
+                    })
+                    return
+
+                now = time.time()
+                with db() as conn:
+                    row = conn.execute("""
+                        SELECT otp_hash,salt,expires_at,attempts
+                        FROM gps_app_otp_challenges WHERE email=%s
+                    """, (email,)).fetchone()
+
+                    if not row:
+                        self.send_json(400, {
+                            "error": "Request a new application OTP first."
+                        })
+                        return
+
+                    expected, salt, expires, attempts = row
+
+                    if now > expires:
+                        conn.execute("""
+                            DELETE FROM gps_app_otp_challenges WHERE email=%s
+                        """, (email,))
+                        self.send_json(400, {
+                            "error": "Application OTP expired. Request another."
+                        })
+                        return
+
+                    if attempts >= MAX_ATTEMPTS:
+                        conn.execute("""
+                            DELETE FROM gps_app_otp_challenges WHERE email=%s
+                        """, (email,))
+                        self.send_json(429, {
+                            "error": "Too many attempts. Request a new application OTP."
+                        })
+                        return
+
+                    supplied = hashlib.sha256(
+                        f"{email}:{otp}:{salt}".encode()
+                    ).hexdigest()
+
+                    if not hmac.compare_digest(supplied, expected):
+                        conn.execute("""
+                            UPDATE gps_app_otp_challenges
+                            SET attempts=attempts+1 WHERE email=%s
+                        """, (email,))
+                        self.send_json(400, {"error": "Incorrect application OTP."})
+                        return
+
+                    conn.execute("""
+                        DELETE FROM gps_app_otp_challenges WHERE email=%s
+                    """, (email,))
+
+                self.send_json(200, {"success": True})
                 return
 
             if path == "/api/request-otp":
