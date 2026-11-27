@@ -1,6 +1,7 @@
 import base64
 import os
 import streamlit as st
+from app_auth import require_app_login
 import streamlit.components.v1 as components
 
 # Import shared LPU Black & Dark Orange Theme
@@ -19,6 +20,9 @@ st.set_page_config(
     page_icon="🚌",
     layout="wide"
 )
+
+# Require separate email OTP before opening this application page.
+require_app_login()
 
 # 2. Inject Black & Dark Orange Theme Styles
 inject_lpu_theme()
