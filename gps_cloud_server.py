@@ -649,11 +649,12 @@ class GPSHandler(BaseHTTPRequestHandler):
                 ]
                 history_items = [
                     {
-                        "latitude": row[0],
-                        "longitude": row[1],
-                        "accuracy": row[2],
-                        "speed": row[3],
-                        "recorded_at": row[4].isoformat()
+                        "email": row[0],
+                        "latitude": row[1],
+                        "longitude": row[2],
+                        "accuracy": row[3],
+                        "speed": row[4],
+                        "recorded_at": row[5].isoformat()
                     }
                     for row in history
                 ]
