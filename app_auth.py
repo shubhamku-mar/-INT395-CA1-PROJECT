@@ -104,13 +104,14 @@ def require_app_login():
         }}
         .st-key-shuttlelyze-login-panel [data-testid="stButton"] button {{
             min-height: 44px;
-            font-size: calc(1rem + 2px) !important;
-            border: 1px solid rgba(255,255,255,0.52) !important;
+            font-size: calc(1rem + 3.5px) !important;
+            border: 1px solid rgba(255,135,25,0.88) !important;
             border-radius: 8px !important;
-            background: rgba(255,255,255,0.055) !important;
-            color: #ff8a24 !important;
-            font-weight: 850 !important;
-            letter-spacing: .35px;
+            background: rgba(20,12,5,0.62) !important;
+            color: #ff7900 !important;
+            font-weight: 950 !important;
+            letter-spacing: .55px;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.55);
         }}
         .st-key-shuttlelyze-login-panel [data-testid="stButton"] button:hover {{
             border-color: #ff914d !important;
