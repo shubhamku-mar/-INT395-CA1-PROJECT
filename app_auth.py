@@ -84,29 +84,36 @@ def require_app_login():
             box-shadow: none !important;
         }}
         .st-key-shuttlelyze-login-panel [data-testid="stTextInput"] label {{
-            color: #f5f5f5 !important;
-            font-size: 0.82rem !important;
+            color: #000000 !important;
+            font-size: 0.86rem !important;
+            font-weight: 800 !important;
         }}
         .st-key-shuttlelyze-login-panel [data-testid="stTextInput"] input {{
-            background: rgba(255,255,255,0.16) !important;
-            border: 1px solid rgba(255,255,255,0.48) !important;
+            background: rgba(255,255,255,0.045) !important;
+            border: 1px solid rgba(255,145,64,0.58) !important;
             border-radius: 8px !important;
-            color: #ffffff !important;
+            color: #ff8a24 !important;
+            font-weight: 750 !important;
             min-height: 38px;
         }}
         .st-key-shuttlelyze-login-panel [data-testid="stTextInput"] input::placeholder {{
-            color: rgba(255,255,255,0.78) !important;
+            color: #ff9a3d !important;
+            opacity: 1 !important;
+            font-weight: 700 !important;
         }}
         .st-key-shuttlelyze-login-panel [data-testid="stButton"] button {{
             min-height: 42px;
             border: 1px solid rgba(255,255,255,0.52) !important;
             border-radius: 8px !important;
-            background: rgba(24,25,28,0.66) !important;
-            color: #ffffff !important;
+            background: rgba(255,255,255,0.055) !important;
+            color: #ff8a24 !important;
+            font-weight: 850 !important;
+            letter-spacing: .35px;
         }}
         .st-key-shuttlelyze-login-panel [data-testid="stButton"] button:hover {{
             border-color: #ff914d !important;
-            color: #ffb17c !important;
+            color: #ffad62 !important;
+            background: rgba(255,255,255,0.10) !important;
         }}
         @media (max-width: 850px) {{
             [data-testid="stHorizontalBlock"] {{ min-height: 100vh; }}
