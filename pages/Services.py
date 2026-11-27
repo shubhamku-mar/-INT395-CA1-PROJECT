@@ -1,6 +1,7 @@
 import os
 import base64
 import importlib.util
+import json
 from datetime import datetime, timedelta
 
 import joblib
@@ -1226,6 +1227,142 @@ st.markdown(
 
 
 # ============================================================
+
+# ============================================================
+# LIVE DESTINATION TRACKING — isolated from existing analytics
+# ============================================================
+st.markdown("<div style='height:18px;'></div>", unsafe_allow_html=True)
+st.markdown(
+    '<div class="services-header">'
+    '<h1 class="services-title">Live Destination Tracking</h1>'
+    '</div>',
+    unsafe_allow_html=True,
+)
+st.caption(
+    "Choose any LPU campus location to follow the latest verified phone GPS device. "
+    "The route and ETA are calculated from its current GPS position."
+)
+
+live_locations = []
+try:
+    _live_routefinder = load_routefinder()
+    if _live_routefinder is not None:
+        _live_frame = _live_routefinder.load_locations()
+        for _, _row in _live_frame.iterrows():
+            _lat = pd.to_numeric(_row.get("Latitude"), errors="coerce")
+            _lon = pd.to_numeric(_row.get("Longitude"), errors="coerce")
+            if pd.notna(_lat) and pd.notna(_lon):
+                _live_locations.append({
+                    "label": f"{str(_row['ID']).strip()} — {str(_row['Location Name']).strip()}",
+                    "name": str(_row["Location Name"]).strip(),
+                    "lat": float(_lat),
+                    "lon": float(_lon),
+                })
+except Exception:
+    live_locations = []
+
+# Use the same workbook-backed campus locations as the existing route finder.
+_live_unique = {}
+for _loc in live_locations:
+    _live_unique[(_loc["label"], _loc["lat"], _loc["lon"])] = _loc
+live_locations = sorted(_live_unique.values(), key=lambda item: item["label"].casefold())
+
+if live_locations:
+    _live_locations_json = json.dumps(live_locations, ensure_ascii=False).replace("</", "<\\/")
+    _live_tracker_html = r"""
+<!doctype html>
+<html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#f8fafc;background:#101010}
+.panel{background:#171717;border:1px solid #343434;border-left:3px solid #ff6a00;border-radius:12px;padding:16px;margin-bottom:12px}
+.controls{display:grid;grid-template-columns:1.3fr 1fr auto;gap:10px;align-items:end}
+label{display:block;color:#ff9a52;font-size:12px;font-weight:bold;margin-bottom:6px}
+input,select,button{width:100%;padding:12px;border-radius:8px;border:1px solid #555;background:#101010;color:white;font-size:14px}
+button{background:#ff6a00;color:#111;border:0;font-weight:bold;cursor:pointer}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.metric{background:#101010;padding:13px;border-radius:9px;color:#bbb;font-size:12px}
+.metric strong{display:block;color:#ff8a35;font-size:21px;margin-top:6px}
+#map{height:430px;border-radius:10px;overflow:hidden}
+#status{font-size:13px;color:#ddd;margin-top:10px;line-height:1.5}
+.small{color:#aaa;font-size:12px;line-height:1.5}
+@media(max-width:700px){.controls{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}#map{height:360px}}
+</style></head><body>
+<div class="panel">
+ <div class="controls">
+  <div><label for="destination">LPU DESTINATION</label><select id="destination"></select></div>
+  <div><label for="key">DASHBOARD ACCESS KEY</label><input id="key" type="password" placeholder="Enter dashboard key"></div>
+  <div><button id="connect">CONNECT & TRACK</button></div>
+ </div>
+ <div id="status">Select a destination, enter your dashboard access key, and click CONNECT &amp; TRACK.</div>
+ <div class="metrics">
+  <div class="metric">ESTIMATED ARRIVAL<strong id="eta">--</strong></div>
+  <div class="metric">ROAD DISTANCE LEFT<strong id="distance">--</strong></div>
+  <div class="metric">DEVICE SPEED<strong id="speed">--</strong></div>
+ </div>
+ <p class="small" id="updated">Waiting for secure connection.</p>
+</div>
+<div class="panel"><div id="map"></div></div>
+<p class="small">ETA uses the road route from OpenStreetMap routing and the latest GPS position. Actual arrival can vary with campus access, traffic, and GPS accuracy. Only the latest device currently reported by the secure GPS service is followed.</p>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const locations=__LOCATIONS__;
+const API="https://shuttlelyze-gps-cloud.onrender.com";
+const select=document.getElementById("destination");
+locations.forEach((p,i)=>{const o=document.createElement("option");o.value=i;o.textContent=p.label;select.appendChild(o);});
+let map=L.map("map").setView([31.255,75.705],15),deviceMarker=null,destMarker=null,routeLine=null,timer=null,lastRouteAt=0,lastDevice=null;
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(map);
+function status(t){document.getElementById("status").textContent=t;}
+function destination(){return locations[Number(select.value)];}
+function setMetric(id,value){document.getElementById(id).textContent=value;}
+async function refresh(forceRoute=false){
+ const key=document.getElementById("key").value.trim();
+ if(!key)throw new Error("Enter the dashboard access key.");
+ const r=await fetch(API+"/api/latest",{headers:{"X-Dashboard-Key":key},cache:"no-store"});
+ const data=await r.json();if(!r.ok)throw new Error(data.error||("GPS service HTTP "+r.status));
+ if(!data.latest){status("Connected, but no active GPS location is available. Start GPS tracking on the phone.");return;}
+ const p=data.latest,from=[p.latitude,p.longitude],to=destination();
+ const age=(Date.now()-new Date(p.recorded_at).getTime())/1000;
+ if(!deviceMarker){deviceMarker=L.marker(from).addTo(map).bindPopup("Latest verified phone");}
+ else deviceMarker.setLatLng(from);
+ if(!destMarker){destMarker=L.marker([to.lat,to.lon]).addTo(map).bindPopup(to.name);}
+ else destMarker.setLatLng([to.lat,to.lon]);
+ setMetric("speed",p.speed==null?"--":(p.speed*3.6).toFixed(1)+" km/h");
+ document.getElementById("updated").textContent="Device: "+(p.email||"verified user")+" · GPS update: "+new Date(p.recorded_at).toLocaleString()+" · "+(age>60?"GPS data is "+Math.round(age/60)+" min old":"GPS data is recent");
+ const changed=!lastDevice||lastDevice.lat!==p.latitude||lastDevice.lon!==p.longitude;
+ if(forceRoute||changed||Date.now()-lastRouteAt>20000){
+  lastRouteAt=Date.now();lastDevice={lat:p.latitude,lon:p.longitude};
+  const url="https://router.project-osrm.org/route/v1/driving/"+p.longitude+","+p.latitude+";"+to.lon+","+to.lat+"?overview=full&geometries=geojson";
+  const rr=await fetch(url);const rd=await rr.json();
+  if(rd.code!=="Ok"||!rd.routes||!rd.routes.length)throw new Error("A road route could not be found for this device and destination.");
+  const route=rd.routes[0],coords=route.geometry.coordinates.map(c=>[c[1],c[0]]);
+  if(routeLine)map.removeLayer(routeLine);
+  routeLine=L.polyline(coords,{color:"#ff6a00",weight:6,opacity:.9}).addTo(map);
+  setMetric("eta",Math.max(1,Math.round(route.duration/60))+" min");
+  setMetric("distance",(route.distance>=1000?(route.distance/1000).toFixed(2)+" km":Math.round(route.distance)+" m"));
+  map.fitBounds(routeLine.getBounds(),{padding:[35,35]});
+  if(route.distance<=40){status("The tracked device has reached the selected destination (within approximately 40 metres).");}
+  else{status("Live tracking active: "+(p.email||"verified device")+" is heading toward "+to.name+". Route ETA is updating.");}
+ }
+}
+document.getElementById("connect").addEventListener("click",async()=>{
+ if(timer)clearInterval(timer);
+ status("Connecting securely and loading the live route...");
+ try{await refresh(true);timer=setInterval(()=>refresh(false).catch(e=>status("Tracking error: "+e.message)),5000);}
+ catch(e){status("Connection failed: "+e.message);}
+});
+select.addEventListener("change",()=>{if(timer)refresh(true).catch(e=>status("Route error: "+e.message));});
+</script></body></html>
+"""
+    _live_tracker_html = _live_tracker_html.replace("__LOCATIONS__", _live_locations_json)
+    components.html(_live_tracker_html, height=760, scrolling=True)
+else:
+    st.warning(
+        "Live destination tracking needs the LPU location workbook with valid Latitude and Longitude columns. "
+        "The existing route analytics above are not affected."
+    )
+
+
 # 12. WHAT-IF DEMAND SIMULATION
 # One location + traffic + weather + peak-hour conditions.
 # Uses the saved model directly; no baseline or manual demand adjustment.
