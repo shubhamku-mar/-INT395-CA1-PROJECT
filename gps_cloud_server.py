@@ -115,10 +115,22 @@ def send_otp(email, otp):
         with urllib.request.urlopen(request, timeout=20) as response:
             return 200 <= response.status < 300
     except urllib.error.HTTPError as exc:
-        print(f"[OTP] Brevo returned HTTP {exc.code}")
+        body = exc.read().decode("utf-8", "replace").strip()
+        try:
+            parsed = json.loads(body)
+            safe_details = {
+                key: parsed[key]
+                for key in ("code", "message", "error", "errorCode")
+                if key in parsed
+            }
+            details = json.dumps(safe_details, ensure_ascii=False)
+        except Exception:
+            details = "(Brevo returned a non-JSON error response)"
+
+        print(f"[OTP] Brevo HTTP {exc.code}; details: {details}")
         raise RuntimeError(
             f"Brevo rejected the request (HTTP {exc.code}). "
-            "Check API permissions and IP restrictions."
+            "Check Render Logs for the Brevo error details."
         ) from None
     except Exception:
         raise RuntimeError("Could not connect to Brevo.") from None
