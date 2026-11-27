@@ -1329,8 +1329,8 @@ async function refresh(forceRoute=false){
  else destMarker.setLatLng([to.lat,to.lon]);
  setMetric("speed",p.speed==null?"--":(p.speed*3.6).toFixed(1)+" km/h");
  document.getElementById("updated").textContent="Device: "+(p.email||"verified user")+" · GPS update: "+new Date(p.recorded_at).toLocaleString()+" · "+(age>60?"GPS data is "+Math.round(age/60)+" min old":"GPS data is recent");
- const changed=!lastDevice||lastDevice.lat!==p.latitude||lastDevice.lon!==p.longitude;
- if(forceRoute||changed||Date.now()-lastRouteAt>20000){
+ const movedMeters=lastDevice?(()=>{const rad=x=>x*Math.PI/180;const dLat=rad(p.latitude-lastDevice.lat),dLon=rad(p.longitude-lastDevice.lon);const a=Math.sin(dLat/2)**2+Math.cos(rad(lastDevice.lat))*Math.cos(rad(p.latitude))*Math.sin(dLon/2)**2;return 6371000*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));})():Infinity;
+ if(forceRoute||movedMeters>=20||Date.now()-lastRouteAt>20000){
   lastRouteAt=Date.now();lastDevice={lat:p.latitude,lon:p.longitude};
   const url="https://router.project-osrm.org/route/v1/driving/"+p.longitude+","+p.latitude+";"+to.lon+","+to.lat+"?overview=full&geometries=geojson";
   const rr=await fetch(url);const rd=await rr.json();
