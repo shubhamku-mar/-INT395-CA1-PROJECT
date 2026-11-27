@@ -63,8 +63,29 @@ def init_db():
             )
         """)
         conn.execute("""
+            ALTER TABLE gps_locations
+            ADD COLUMN IF NOT EXISTS session_id TEXT
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS gps_device_sessions (
+                session_id TEXT PRIMARY KEY,
+                email TEXT NOT NULL,
+                started_at TIMESTAMPTZ NOT NULL,
+                ended_at TIMESTAMPTZ
+            )
+        """)
+        conn.execute("""
             CREATE INDEX IF NOT EXISTS gps_locations_email_id_idx
             ON gps_locations(email, id DESC)
+        """)
+        conn.execute("""
+            CREATE INDEX IF NOT EXISTS gps_locations_session_id_idx
+            ON gps_locations(session_id, id DESC)
+        """)
+        conn.execute("""
+            CREATE INDEX IF NOT EXISTS gps_device_sessions_active_idx
+            ON gps_device_sessions(email, started_at DESC)
+            WHERE ended_at IS NULL
         """)
         conn.execute("""
             CREATE TABLE IF NOT EXISTS gps_otp_challenges (
@@ -273,10 +294,19 @@ input{background:#0f172a;color:white;border:1px solid #64748b;width:min(100%,420
 button{background:#f97316;border:0;font-weight:bold;cursor:pointer}
 #map{height:65vh;min-height:380px;border-radius:12px}
 .metrics{display:flex;gap:12px;flex-wrap:wrap}
-.metric{background:#0f172a;padding:13px;border-radius:9px;min-width:145px}
+.metric{background:#0f172a;padding:13px;border-radius:9px;min-width:145px;flex:1}
 .metric strong{display:block;color:#fb923c;font-size:20px;margin-top:7px}
 .muted{color:#cbd5e1;font-size:14px}
 #status{margin-top:10px;color:#cbd5e1}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.actions button{flex:1;min-width:180px}
+button.secondary{background:#334155;color:white}
+button.danger{background:#dc2626;color:white}
+.history-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:620px}
+th,td{text-align:left;padding:11px 9px;border-bottom:1px solid #334155;font-size:13px}
+th{color:#fb923c}
+.empty{color:#cbd5e1;padding:12px 0}
 </style>
 </head>
 <body>
@@ -297,8 +327,23 @@ button{background:#f97316;border:0;font-weight:bold;cursor:pointer}
 <div class="metric">Longitude<strong id="longitude">--</strong></div>
 </div>
 <p class="muted" id="updated">Waiting for GPS data.</p>
+<div class="actions">
+<button class="danger" onclick="resetLocation()">↻ RESET LOCATION / NEW SESSION</button>
+<button class="secondary" onclick="loadHistory()">◷ DEVICE HISTORY</button>
+</div>
+<p class="muted">Reset starts a new tracking session. Previous GPS records are kept.</p>
 </div>
 <div class="panel"><div id="map"></div></div>
+<div class="panel" id="history">
+<h3>Device History — Last 10 Locations</h3>
+<p class="muted" id="historyStatus">Connect to load recent GPS records.</p>
+<div class="history-wrap">
+<table>
+<thead><tr><th>#</th><th>Date &amp; Time</th><th>Latitude</th><th>Longitude</th><th>Accuracy</th><th>Speed</th></tr></thead>
+<tbody id="historyRows"><tr><td colspan="6" class="empty">No history loaded.</td></tr></tbody>
+</table>
+</div>
+</div>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -314,6 +359,64 @@ function setupMap(){
   maxZoom:19,attribution:"&copy; OpenStreetMap contributors"
  }).addTo(map);
 }
+function clearLiveDisplay(){
+ ["speed","accuracy","latitude","longitude"].forEach(id=>{
+  document.getElementById(id).textContent="--";
+ });
+ document.getElementById("updated").textContent="Waiting for fresh GPS data in the new session.";
+ if(marker){map.removeLayer(marker);marker=null;}
+ if(trail){map.removeLayer(trail);trail=null;}
+ if(accuracyCircle){map.removeLayer(accuracyCircle);accuracyCircle=null;}
+}
+function renderHistory(items){
+ const body=document.getElementById("historyRows");
+ if(!items||!items.length){
+  body.innerHTML='<tr><td colspan="6" class="empty">No GPS history available yet.</td></tr>';
+  return;
+ }
+ body.innerHTML=items.map((p,index)=>'<tr>'+
+  '<td>'+(index+1)+'</td>'+
+  '<td>'+new Date(p.recorded_at).toLocaleString()+'</td>'+
+  '<td>'+Number(p.latitude).toFixed(6)+'</td>'+
+  '<td>'+Number(p.longitude).toFixed(6)+'</td>'+
+  '<td>'+(p.accuracy==null?'--':Number(p.accuracy).toFixed(1)+' m')+'</td>'+
+  '<td>'+(p.speed==null?'--':(Number(p.speed)*3.6).toFixed(1)+' km/h')+'</td>'+
+ '</tr>').join('');
+}
+async function loadHistory(){
+ if(!dashboardKey){document.getElementById("historyStatus").textContent="Connect with your dashboard key first.";return;}
+ try{
+  const response=await fetch("/api/history",{
+   headers:{"X-Dashboard-Key":dashboardKey},cache:"no-store"
+  });
+  const result=await response.json();
+  if(!response.ok)throw new Error(result.error||"Could not load history");
+  renderHistory(result.history||[]);
+  document.getElementById("historyStatus").textContent=
+   "Showing the 10 most recent GPS records. Previous sessions are included.";
+ }catch(e){
+  document.getElementById("historyStatus").textContent="History error: "+e.message;
+ }
+}
+async function resetLocation(){
+ if(!dashboardKey){setStatus("Connect with your dashboard key first.");return;}
+ if(!confirm("Start a new GPS tracking session? Previous location history will be preserved."))return;
+ try{
+  const response=await fetch("/api/reset-session",{
+   method:"POST",
+   headers:{"X-Dashboard-Key":dashboardKey,"Content-Type":"application/json"},
+   body:"{}"
+  });
+  const result=await response.json();
+  if(!response.ok)throw new Error(result.error||"Could not reset session");
+  clearLiveDisplay();
+  setStatus("New tracking session started. Start or continue GPS tracking on the phone.");
+  await loadHistory();
+  if(timer){clearInterval(timer);timer=setInterval(refresh,2000);}
+ }catch(e){
+  setStatus("Reset error: "+e.message);
+ }
+}
 async function refresh(){
  try{
   const response=await fetch("/api/latest",{
@@ -323,13 +426,15 @@ async function refresh(){
   const result=await response.json();
   if(!response.ok)throw new Error(result.error||"Dashboard request failed");
   if(!result.latest){
-   setStatus("Connected. No GPS data received yet. Start tracking on the phone.");
+   clearLiveDisplay();
+   setStatus("Connected. Waiting for GPS data in the current session.");
+   renderHistory(result.history||[]);
    return;
   }
   const p=result.latest;
   const point=[p.latitude,p.longitude];
   document.getElementById("speed").textContent=
-   ((p.speed||0)*3.6).toFixed(1)+" km/h";
+   (p.speed==null?"--":(p.speed*3.6).toFixed(1)+" km/h");
   document.getElementById("accuracy").textContent=
    (p.accuracy==null?"--":p.accuracy.toFixed(1)+" m");
   document.getElementById("latitude").textContent=p.latitude.toFixed(6);
@@ -354,6 +459,7 @@ async function refresh(){
    color:"#00bfff",fillOpacity:.12
   }).addTo(map);
   setStatus("Connected. Live GPS data is updating.");
+  renderHistory(result.history||[]);
  }catch(e){
   setStatus("Dashboard error: "+e.message);
  }
@@ -364,6 +470,7 @@ function connect(){
  if(timer)clearInterval(timer);
  setupMap();
  refresh();
+ loadHistory();
  timer=setInterval(refresh,2000);
 }
 </script>
@@ -445,45 +552,112 @@ class GPSHandler(BaseHTTPRequestHandler):
 
             try:
                 with db() as conn:
+                    device = conn.execute("""
+                        SELECT email FROM gps_locations
+                        ORDER BY id DESC LIMIT 1
+                    """).fetchone()
+                    if not device:
+                        self.send_json(200, {"latest": None, "trail": [], "history": []})
+                        return
+
+                    email = device[0]
+                    session = conn.execute("""
+                        SELECT session_id FROM gps_device_sessions
+                        WHERE email=%s AND ended_at IS NULL
+                        ORDER BY started_at DESC LIMIT 1
+                    """, (email,)).fetchone()
+                    session_id = session[0] if session else None
+
                     latest = conn.execute("""
                         SELECT email,latitude,longitude,accuracy,speed,
                                heading,recorded_at
                         FROM gps_locations
+                        WHERE email=%s AND session_id=%s
                         ORDER BY id DESC LIMIT 1
-                    """).fetchone()
+                    """, (email, session_id)).fetchone() if session_id else None
 
                     trail = conn.execute("""
                         SELECT latitude,longitude
                         FROM (
                             SELECT id,latitude,longitude
                             FROM gps_locations
-                            WHERE email=%s
+                            WHERE email=%s AND session_id=%s
                             ORDER BY id DESC LIMIT 100
                         ) recent
                         ORDER BY id ASC
-                    """, (latest[0],)).fetchall() if latest else []
+                    """, (email, session_id)).fetchall() if session_id else []
 
-                if not latest:
-                    self.send_json(200, {"latest": None, "trail": []})
-                    return
+                    history = conn.execute("""
+                        SELECT latitude,longitude,accuracy,speed,recorded_at
+                        FROM gps_locations
+                        WHERE email=%s
+                        ORDER BY id DESC LIMIT 10
+                    """, (email,)).fetchall()
 
-                item = {
-                    "email": latest[0],
-                    "latitude": latest[1],
-                    "longitude": latest[2],
-                    "accuracy": latest[3],
-                    "speed": latest[4],
-                    "heading": latest[5],
-                    "recorded_at": latest[6].isoformat()
-                }
+                item = None
+                if latest:
+                    item = {
+                        "email": latest[0],
+                        "latitude": latest[1],
+                        "longitude": latest[2],
+                        "accuracy": latest[3],
+                        "speed": latest[4],
+                        "heading": latest[5],
+                        "recorded_at": latest[6].isoformat()
+                    }
                 points = [
                     {"latitude": row[0], "longitude": row[1]}
                     for row in trail
                 ]
-                self.send_json(200, {"latest": item, "trail": points})
+                history_items = [
+                    {
+                        "latitude": row[0],
+                        "longitude": row[1],
+                        "accuracy": row[2],
+                        "speed": row[3],
+                        "recorded_at": row[4].isoformat()
+                    }
+                    for row in history
+                ]
+                self.send_json(200, {
+                    "latest": item, "trail": points, "history": history_items
+                })
             except Exception:
                 print("[GPS] Could not read latest location.")
                 self.send_json(500, {"error": "Could not read GPS data."})
+            return
+
+        if path == "/api/history":
+            if not self.authorized_dashboard():
+                self.send_json(401, {"error": "Dashboard access key is invalid."})
+                return
+            try:
+                with db() as conn:
+                    device = conn.execute("""
+                        SELECT email FROM gps_locations
+                        ORDER BY id DESC LIMIT 1
+                    """).fetchone()
+                    if not device:
+                        self.send_json(200, {"history": []})
+                        return
+                    rows = conn.execute("""
+                        SELECT latitude,longitude,accuracy,speed,recorded_at
+                        FROM gps_locations
+                        WHERE email=%s
+                        ORDER BY id DESC LIMIT 10
+                    """, (device[0],)).fetchall()
+                history = [
+                    {
+                        "latitude": row[0], "longitude": row[1],
+                        "accuracy": row[2], "speed": row[3],
+                        "recorded_at": row[4].isoformat()
+                    }
+                    for row in rows
+                ]
+                self.send_json(200, {"history": history})
+            except Exception:
+                print("[GPS] Could not read device history.")
+                self.send_json(500, {"error": "Could not read device history."})
             return
 
         self.send_json(404, {"error": "Not found."})
@@ -492,6 +666,40 @@ class GPSHandler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
 
         try:
+            if path == "/api/reset-session":
+                if not self.authorized_dashboard():
+                    self.send_json(401, {"error": "Dashboard access key is invalid."})
+                    return
+                now = datetime.now(timezone.utc)
+                with db() as conn:
+                    device = conn.execute("""
+                        SELECT email FROM gps_locations
+                        ORDER BY id DESC LIMIT 1
+                    """).fetchone()
+                    if not device:
+                        self.send_json(409, {
+                            "error": "No verified device has sent GPS data yet."
+                        })
+                        return
+                    email = device[0]
+                    conn.execute("""
+                        UPDATE gps_device_sessions
+                        SET ended_at=%s
+                        WHERE email=%s AND ended_at IS NULL
+                    """, (now, email))
+                    session_id = secrets.token_hex(16)
+                    conn.execute("""
+                        INSERT INTO gps_device_sessions
+                        (session_id,email,started_at,ended_at)
+                        VALUES(%s,%s,%s,NULL)
+                    """, (session_id, email, now))
+                self.send_json(200, {
+                    "success": True,
+                    "message": "New tracking session started.",
+                    "session_started_at": now.isoformat()
+                })
+                return
+
             if path == "/api/request-otp":
                 data = self.read_json()
                 email = str(data.get("email", "")).strip().lower()
@@ -649,13 +857,25 @@ class GPSHandler(BaseHTTPRequestHandler):
                 heading = optional_number("heading", 0, 360)
 
                 with db() as conn:
+                    active = conn.execute("""
+                        SELECT session_id FROM gps_device_sessions
+                        WHERE email=%s AND ended_at IS NULL
+                        ORDER BY started_at DESC LIMIT 1
+                    """, (email,)).fetchone()
+                    session_id = active[0] if active else secrets.token_hex(16)
+                    if not active:
+                        conn.execute("""
+                            INSERT INTO gps_device_sessions
+                            (session_id,email,started_at,ended_at)
+                            VALUES(%s,%s,%s,NULL)
+                        """, (session_id, email, datetime.now(timezone.utc)))
                     conn.execute("""
                         INSERT INTO gps_locations
-                        (email,latitude,longitude,accuracy,speed,heading,recorded_at)
-                        VALUES(%s,%s,%s,%s,%s,%s,%s)
+                        (email,latitude,longitude,accuracy,speed,heading,recorded_at,session_id)
+                        VALUES(%s,%s,%s,%s,%s,%s,%s,%s)
                     """, (
                         email, lat, lon, accuracy, speed, heading,
-                        datetime.now(timezone.utc)
+                        datetime.now(timezone.utc), session_id
                     ))
 
                 self.send_json(200, {"success": True})
