@@ -1,4 +1,6 @@
+import base64
 import re
+from pathlib import Path
 
 import requests
 import streamlit as st
@@ -21,6 +23,41 @@ def require_app_login():
                 st.session_state.pop(key, None)
             st.rerun()
         return
+
+
+    # Full-screen LPU campus background for the application OTP screen.
+    background_path = Path(__file__).resolve().parent / "assets" / "lpu_login_background.png"
+    if background_path.exists():
+        background_b64 = base64.b64encode(background_path.read_bytes()).decode("ascii")
+        st.markdown(
+            f"""
+            <style>
+            [data-testid="stAppViewContainer"] {{
+                background:
+                    linear-gradient(rgba(10, 12, 18, 0.48), rgba(10, 12, 18, 0.62)),
+                    url("data:image/png;base64,{background_b64}") center center / cover fixed;
+            }}
+            [data-testid="stHeader"] {{ background: transparent; }}
+            [data-testid="stMain"] {{ background: transparent; }}
+            [data-testid="stMainBlockContainer"] {{
+                background: rgba(12, 15, 22, 0.70);
+                border: 1px solid rgba(255,255,255,0.16);
+                border-radius: 20px;
+                padding: 2rem 2.5rem 2.5rem;
+                margin-top: 3rem;
+                backdrop-filter: blur(8px);
+                box-shadow: 0 18px 55px rgba(0,0,0,0.35);
+            }}
+            @media (max-width: 700px) {{
+                [data-testid="stMainBlockContainer"] {{
+                    margin-top: 1rem;
+                    padding: 1.2rem 1rem 1.5rem;
+                }}
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
 
     st.markdown(
         """
