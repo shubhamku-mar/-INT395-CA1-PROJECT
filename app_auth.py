@@ -74,14 +74,14 @@ def require_app_login():
             overflow-y: auto;
             padding: clamp(34px, 6vh, 64px) 1.05rem 1.5rem;
             margin: 0 !important;
-            background: linear-gradient(160deg, rgba(22, 39, 52, 0.38), rgba(8, 27, 36, 0.48));
+            background: transparent !important;
             border-left: 1px solid rgba(255,255,255,0.28);
             border-right: 0;
             border-top: 0;
             border-bottom: 0;
             border-radius: 0;
-            backdrop-filter: blur(5px);
-            box-shadow: -12px 0 42px rgba(0,0,0,0.24);
+            backdrop-filter: none !important;
+            box-shadow: none !important;
         }}
         .st-key-shuttlelyze-login-panel [data-testid="stTextInput"] label {{
             color: #f5f5f5 !important;
