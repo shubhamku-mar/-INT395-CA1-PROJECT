@@ -40,18 +40,26 @@ def require_app_login():
             [data-testid="stHeader"] {{ background: transparent; }}
             [data-testid="stMain"] {{ background: transparent; }}
             [data-testid="stMainBlockContainer"] {{
-                background: rgba(12, 15, 22, 0.70);
-                border: 1px solid rgba(255,255,255,0.16);
-                border-radius: 20px;
-                padding: 2rem 2.5rem 2.5rem;
-                margin-top: 3rem;
-                backdrop-filter: blur(8px);
+                width: min(560px, 43vw);
+                max-width: 560px;
+                margin-left: auto;
+                margin-right: clamp(24px, 5vw, 90px);
+                margin-top: clamp(24px, 12vh, 110px);
+                padding: 1.15rem 1.5rem 1.35rem;
+                background: rgba(12, 15, 22, 0.76);
+                border: 1px solid rgba(255,255,255,0.18);
+                border-radius: 18px;
+                backdrop-filter: blur(9px);
                 box-shadow: 0 18px 55px rgba(0,0,0,0.35);
             }}
-            @media (max-width: 700px) {{
+            [data-testid="stMainBlockContainer"] h1 {{
+                font-size: clamp(1.65rem, 2.2vw, 2.1rem);
+            }}
+            @media (max-width: 900px) {{
                 [data-testid="stMainBlockContainer"] {{
-                    margin-top: 1rem;
-                    padding: 1.2rem 1rem 1.5rem;
+                    width: min(620px, calc(100vw - 32px));
+                    margin: 24px auto;
+                    padding: 1.1rem 1.2rem 1.3rem;
                 }}
             }}
             </style>
@@ -61,11 +69,11 @@ def require_app_login():
 
     st.markdown(
         """
-        <div style="text-align:center; padding:55px 10px 15px;">
+        <div style="text-align:center; padding:8px 6px 8px;">
             <div style="color:#FF6A00; font-size:13px; font-weight:700;
                         letter-spacing:2px;">SHUTTLELYZE SECURITY</div>
-            <h1 style="color:white; margin:8px 0;">Email OTP Login</h1>
-            <p style="color:#B3B3B3;">Verify your email to open the SHUTTLELYZE application.</p>
+            <h1 style="color:white; margin:6px 0; font-size:30px;">Email OTP Login</h1>
+            <p style="color:#D0D0D0; margin:4px 0 8px;">Verify your email to open the SHUTTLELYZE application.</p>
         </div>
         """,
         unsafe_allow_html=True,
