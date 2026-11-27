@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 import joblib
 import pandas as pd
 import streamlit as st
+from app_auth import require_app_login
 import streamlit.components.v1 as components
 from assets.frontend_theme import inject_lpu_theme, render_top_banner, render_cinematic_footer, get_lpu_logo_url, get_lpu_campus_url
 
@@ -19,6 +20,9 @@ st.set_page_config(
     page_icon="🚌",
     layout="wide",
 )
+
+# Require separate email OTP before opening this application page.
+require_app_login()
 
 PROJECT_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..")
